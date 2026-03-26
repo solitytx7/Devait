@@ -1,0 +1,3048 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết khóa học | EduPlatform</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Xem chi tiết khóa học trực tuyến chất lượng cao với giảng viên chuyên nghiệp">
+    <meta name="keywords" content="khóa học online, học trực tuyến, giáo dục">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Chi tiết khóa học | EduPlatform">
+    <meta property="og:description" content="Xem chi tiết khóa học trực tuyến chất lượng cao">
+    <meta property="og:type" content="website">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Socket.IO Client from CDN (fallback) -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Fallback to local if CDN fails -->
+    <script>
+        if (typeof io === 'undefined') {
+            document.write('<script src="/socket.io/socket.io.js"><\/script>');
+        }
+    </script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    
+    <style>
+        /* Course Detail Specific Styles */
+        .course-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .course-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="1000,100 1000,0 0,100"/></svg>');
+            background-size: cover;
+            background-position: bottom;
+        }
+
+        .course-header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .breadcrumb {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.8;
+        }
+
+        .course-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 1rem 0;
+            line-height: 1.2;
+        }
+
+        .course-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .course-meta-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .course-price-header {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .course-rating-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .course-rating-header .stars {
+            color: #ffd700;
+        }
+
+        .course-content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .course-main-content {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-large);
+            overflow: hidden;
+        }
+
+        .course-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .course-video-section {
+            position: relative;
+            background: var(--bg-secondary);
+            padding: 2rem;
+        }
+
+        .course-video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .course-video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .course-video-placeholder:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .course-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: var(--border-radius);
+        }
+
+        .course-info-section {
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-color);
+            display: inline-block;
+        }
+
+        .course-description {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+        }
+
+        .course-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .detail-card-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .detail-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-card-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .course-tags {
+            margin: 2rem 0;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .course-tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .course-tag:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-large);
+            overflow: hidden;
+        }
+
+        .sidebar-card-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .sidebar-card-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .sidebar-card-content {
+            padding: 1.5rem;
+        }
+
+        .purchase-section {
+            text-align: center;
+        }
+
+        .course-price-large {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .course-discount {
+            background: var(--error-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            margin-right: 1rem;
+        }
+
+        .btn-enroll {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-enroll:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-large);
+        }
+
+        .btn-wishlist {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-wishlist:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-chat {
+            width: 100%;
+            padding: 1rem;
+            background: #25d366;
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-chat:hover {
+            background: #1faa4f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Chat Modal Styles */
+        .chat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chat-modal.active {
+            opacity: 1;
+        }
+
+        .chat-container {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            height: 80%;
+            max-height: 600px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .chat-modal.active .chat-container {
+            transform: scale(1);
+        }
+
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .chat-message.own {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            max-width: 70%;
+        }
+
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            margin-bottom: 0.25rem;
+            word-wrap: break-word;
+        }
+
+        .chat-message:not(.own) .message-bubble {
+            background: white;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-message.own .message-bubble {
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #666;
+            text-align: right;
+        }
+
+        .chat-message.own .message-time {
+            text-align: left;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #e9ecef;
+            background: white;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .chat-textarea {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            resize: none;
+            max-height: 100px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .chat-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .chat-send {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .chat-send:hover {
+            background: var(--primary-dark);
+        }
+
+        .chat-send:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .chat-empty {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .chat-empty i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .course-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .course-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .course-features li:last-child {
+            border-bottom: none;
+        }
+
+        .course-features i {
+            color: var(--success-color);
+            font-size: 1.125rem;
+        }
+
+        .instructor-section {
+            border-top: 2px solid var(--border-color);
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
+
+        .instructor-card {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .instructor-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .instructor-info h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .instructor-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Comments Section Styles */
+        .comments-section {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .comments-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comments-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .comments-sort {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comments-sort select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background: white;
+            color: var(--text-color);
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .comment-form {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .comment-form.not-logged-in {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 0.925rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .comment-form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .comment-form-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-comment {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-comment:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-comment:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid #ddd;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .comment {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .comment:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.1);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .comment-author-info h4 {
+            margin: 0;
+            font-size: 0.925rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .comment-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .comment-edited {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .comment-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comment-action-btn {
+            background: none;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .comment-action-btn:hover {
+            background: #f5f5f5;
+            color: var(--text-color);
+        }
+
+        .comment-action-btn.liked {
+            color: var(--accent-color);
+        }
+
+        .comment-content {
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .comment-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comment-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .comment-likes {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .comment-replies {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .comment-reply-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-reply {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reply:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .replies-section {
+            margin-top: 1rem;
+            margin-left: 3rem;
+            padding-left: 1rem;
+            border-left: 2px solid #f0f0f0;
+        }
+
+        .replies-toggle {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .replies-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .reply {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            margin-top: 1rem;
+        }
+
+        .reply .comment-avatar {
+            width: 32px;
+            height: 32px;
+            font-size: 0.8rem;
+        }
+
+        .reply-form {
+            margin-top: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            font-family: inherit;
+            font-size: 0.925rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .reply-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .comment-edit-textarea {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            font-family: inherit;
+            font-size: 0.925rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-edit-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .comments-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .comments-loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .comments-empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .comments-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .comments-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .comment-form {
+                padding: 1rem;
+            }
+
+            .comment {
+                padding: 1rem;
+            }
+
+            .comment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .comment-actions {
+                align-self: flex-end;
+            }
+
+            .replies-section {
+                margin-left: 1rem;
+            }
+
+            .comment-form-footer {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .comment-form-actions {
+                justify-content: center;
+            }
+        }
+
+        .related-courses {
+            margin-top: 4rem;
+        }
+
+        .related-courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .back-button {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Loading States */
+        .course-detail-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+
+        .course-detail-error {
+            text-align: center;
+            padding: 3rem;
+            color: var(--error-color);
+        }
+
+        .course-detail-error i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .course-content-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .sidebar-card {
+                order: -1;
+            }
+            
+            .course-details-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .course-detail-container {
+                padding: 1rem;
+            }
+            
+            .course-header {
+                padding: 2rem 1.5rem;
+                margin-bottom: 2rem;
+            }
+            
+            .course-title {
+                font-size: 2rem;
+            }
+            
+            .course-meta-header {
+                gap: 1rem;
+            }
+            
+            .course-price-header {
+                font-size: 2rem;
+            }
+            
+            .course-details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-price-large {
+                font-size: 2rem;
+            }
+            
+            .instructor-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .course-title {
+                font-size: 1.75rem;
+            }
+            
+            .breadcrumb {
+                font-size: 0.875rem;
+            }
+            
+            .tags-container {
+                gap: 0.5rem;
+            }
+            
+            .course-tag {
+                font-size: 0.75rem;
+                padding: 0.375rem 0.75rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .course-header,
+            .sidebar-card,
+            .back-button {
+                display: none;
+            }
+            
+            .course-content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-detail-container">
+        <!-- Back Button -->
+        <a href="/" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Quay lại trang chủ
+        </a>
+
+        <!-- Loading State -->
+        <div id="courseLoading" class="course-detail-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+
+        <!-- Error State -->
+        <div id="courseError" class="course-detail-error" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Không tìm thấy khóa học</h2>
+            <p>Khóa học bạn đang tìm kiếm có thể đã bị xóa hoặc không tồn tại.</p>
+            <a href="/" class="btn btn-primary">Về trang chủ</a>
+        </div>
+
+        <!-- Course Content -->
+        <div id="courseContent" style="display: none;">
+            <!-- Course Header -->
+            <div class="course-header fade-in">
+                <div class="course-header-content">
+                    <nav class="breadcrumb">
+                        <a href="/">Trang chủ</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span id="courseBreadcrumb">Khóa học</span>
+                    </nav>
+                    
+                    <h1 class="course-title" id="courseTitle">Đang tải...</h1>
+                    <p class="course-subtitle" id="courseDescription">Đang tải mô tả khóa học...</p>
+                    
+                    <div class="course-meta-header">
+                        <div class="course-price-header" id="coursePriceHeader">Miễn phí</div>
+                        <div class="course-rating-header">
+                            <div class="stars" id="courseStarsHeader">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span id="courseRatingHeader">5.0</span>
+                            <span>(<span id="courseStudentsHeader">0</span> học viên)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Content Grid -->
+            <div class="course-content-grid">
+                <!-- Main Content -->
+                <div class="course-main-content slide-up">
+                    <!-- Video Section -->
+                    <div class="course-video-section">
+                        <div class="course-video-container" id="courseVideoContainer">
+                            <div class="course-video-placeholder" id="videoPlaceholder">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Information -->
+                    <div class="course-info-section">
+                        <h2 class="section-title">Thông tin khóa học</h2>
+                        
+                        <div class="course-description" id="courseDescriptionFull">
+                            Đang tải mô tả chi tiết khóa học...
+                        </div>
+
+                        <!-- Course Details Grid -->
+                        <div class="course-details-grid">
+                            <div class="detail-card">
+                                <div class="detail-card-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="detail-card-value" id="courseDuration">0h 0m</div>
+                                <div class="detail-card-label">Thời lượng</div>
+                            </div>
+
+                            <div class="detail-card">
+                                <div class="detail-card-icon">
+                                    <i class="fas fa-signal"></i>
+                                </div>
+                                <div class="detail-card-value" id="courseLevel">Cơ bản</div>
+                                <div class="detail-card-label">Cấp độ</div>
+                            </div>
+
+                            <div class="detail-card">
+                                <div class="detail-card-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="detail-card-value" id="courseStudents">0</div>
+                                <div class="detail-card-label">Học viên</div>
+                            </div>
+
+                            <div class="detail-card">
+                                <div class="detail-card-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="detail-card-value">Có</div>
+                                <div class="detail-card-label">Chứng chỉ</div>
+                            </div>
+                        </div>
+
+                        <!-- Course Tags -->
+                        <div class="course-tags" id="courseTagsSection" style="display: none;">
+                            <h3 class="section-title">Tags</h3>
+                            <div class="tags-container" id="courseTags">
+                                <!-- Tags will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Instructor Section -->
+                        <div class="instructor-section">
+                            <h3 class="section-title">Giảng viên</h3>
+                            <div class="instructor-card">
+                                <div class="instructor-avatar" id="instructorAvatar">
+                                    GV
+                                </div>
+                                <div class="instructor-info">
+                                    <h4 id="instructorName">Đang tải...</h4>
+                                    <p>Giảng viên chuyên nghiệp với nhiều năm kinh nghiệm trong lĩnh vực giáo dục và thực tiễn.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="course-sidebar">
+                    <!-- Purchase Card -->
+                    <div class="sidebar-card slide-up">
+                        <div class="sidebar-card-header">
+                            <h3>Đăng ký khóa học</h3>
+                        </div>
+                        <div class="sidebar-card-content">
+                            <div class="purchase-section">
+                                <div id="discountBadge" class="course-discount" style="display: none;">
+                                    Giảm 50%
+                                </div>
+                                <div>
+                                    <span id="originalPrice" class="original-price" style="display: none;">2.000.000 VND</span>
+                                    <div class="course-price-large" id="coursePriceSidebar">Miễn phí</div>
+                                </div>
+                                
+                                <button class="btn-enroll" onclick="enrollCourse()">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Đăng ký ngay
+                                </button>
+                                
+                                <button class="btn-wishlist" onclick="addToWishlist()">
+                                    <i class="fas fa-heart"></i>
+                                    Thêm vào yêu thích
+                                </button>
+
+                                <button class="btn-chat" onclick="openChatModal()">
+                                    <i class="fas fa-comments"></i>
+                                    Chat với giảng viên
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Features -->
+                    <div class="sidebar-card slide-up">
+                        <div class="sidebar-card-header">
+                            <h3>Điểm nổi bật</h3>
+                        </div>
+                        <div class="sidebar-card-content">
+                            <ul class="course-features">
+                                <li>
+                                    <i class="fas fa-video"></i>
+                                    <span>Video HD chất lượng cao</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>Học mọi lúc mọi nơi</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-infinity"></i>
+                                    <span>Truy cập trọn đời</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-certificate"></i>
+                                    <span>Chứng chỉ hoàn thành</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-comments"></i>
+                                    <span>Hỗ trợ từ giảng viên</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-download"></i>
+                                    <span>Tài liệu tải về</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <div class="comments-header">
+                    <h2 class="comments-title">
+                        <i class="fas fa-comments"></i>
+                        Bình luận
+                        <span class="comments-count" id="commentsCount">0</span>
+                    </h2>
+                    <div class="comments-sort">
+                        <label for="commentSort">Sắp xếp:</label>
+                        <select id="commentSort" onchange="CommentsManager.changeSortOrder()">
+                            <option value="createdAt-desc">Mới nhất</option>
+                            <option value="createdAt-asc">Cũ nhất</option>
+                            <option value="likes-desc">Nhiều like nhất</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Comment Form -->
+                <div class="comment-form" id="commentForm">
+                    <div class="comment-form-content">
+                        <textarea 
+                            id="commentContent" 
+                            placeholder="Chia sẻ ý kiến của bạn về khóa học này..."
+                            maxlength="1000">
+                        </textarea>
+                        <div class="comment-form-footer">
+                            <div class="comment-char-count">
+                                <span id="commentCharCount">0</span>/1000
+                            </div>
+                            <div class="comment-form-actions">
+                                <button type="button" class="btn-cancel" onclick="CommentsManager.cancelComment()" style="display: none;">
+                                    Hủy
+                                </button>
+                                <button type="button" class="btn-comment" onclick="CommentsManager.submitComment()">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Gửi bình luận
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments List -->
+                <div class="comments-list" id="commentsList">
+                    <div class="comments-loading" id="commentsLoading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Đang tải bình luận...
+                    </div>
+                </div>
+
+                <!-- Comments Pagination -->
+                <div class="comments-pagination" id="commentsPagination" style="display: none;">
+                    <!-- Pagination will be populated here -->
+                </div>
+            </div>
+
+            <!-- Related Courses -->
+            <div class="related-courses">
+                <h2 class="section-title">Khóa học liên quan</h2>
+                <div class="related-courses-grid" id="relatedCoursesGrid">
+                    <!-- Related courses will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/assets/js/app.js"></script>
+    <script>
+        // Course Detail Application
+        class CourseDetailManager {
+            static async loadCourseDetail() {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const courseId = urlParams.get('id') || urlParams.get('course');
+                    
+                    if (!courseId) {
+                        this.showError();
+                        return;
+                    }
+
+                    const response = await APIService.getCourse(courseId);
+                    
+                    if (response.success) {
+                        this.renderCourse(response.data);
+                        await this.loadRelatedCourses(response.data.category, courseId);
+                        await CommentsManager.init(courseId);
+                        await this.checkEnrollmentStatus(courseId);
+                        
+                        this.hideLoading();
+                    } else {
+                        this.showError();
+                    }
+                } catch (error) {
+                    console.error('Error loading course detail:', error);
+                    this.showError();
+                }
+            }
+
+            static async checkEnrollmentStatus(courseId) {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                try {
+                    const response = await fetch(`/api/enrollments/course/${courseId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success && result.data) {
+                        // Người dùng đã đăng ký khóa học
+                        const btn = document.querySelector('.btn-enroll');
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-play-circle"></i> Học khóa học';
+                            btn.style.background = 'linear-gradient(135deg, var(--success-color), #27ae60)';
+                            btn.onclick = () => this.startLearning(courseId);
+                        }
+                    }
+                } catch (error) {
+                    // Người dùng chưa đăng ký hoặc lỗi xảy ra
+                    console.log('User not enrolled or error checking enrollment');
+                }
+            }
+
+            static startLearning(courseId) {
+                window.location.href = `/course-learning.html?courseId=${courseId}`;
+            }
+
+            static renderCourse(course) {
+                // Update page title
+                document.title = `${course.name} | EduPlatform`;
+                
+                // Update meta description
+                const metaDesc = document.querySelector('meta[name="description"]');
+                if (metaDesc) {
+                    metaDesc.content = course.description;
+                }
+
+                // Update Open Graph meta
+                const ogTitle = document.querySelector('meta[property="og:title"]');
+                const ogDesc = document.querySelector('meta[property="og:description"]');
+                if (ogTitle) ogTitle.content = `${course.name} | EduPlatform`;
+                if (ogDesc) ogDesc.content = course.description;
+
+                // Update breadcrumb
+                document.getElementById('courseBreadcrumb').textContent = course.category;
+
+                // Update header
+                document.getElementById('courseTitle').textContent = course.name;
+                document.getElementById('courseDescription').textContent = course.description;
+                
+                const priceText = course.price ? course.price.toLocaleString('vi-VN') + ' VND' : 'Miễn phí';
+                document.getElementById('coursePriceHeader').textContent = priceText;
+                document.getElementById('coursePriceSidebar').textContent = priceText;
+                
+                document.getElementById('courseRatingHeader').textContent = course.rating || '5.0';
+                document.getElementById('courseStudentsHeader').textContent = course.studentsCount || '0';
+
+                // Update stars
+                this.updateStars(course.rating || 5);
+
+                // Update video
+                this.setupVideo(course.video, course.image);
+
+                // Update course details
+                document.getElementById('courseDescriptionFull').textContent = course.description;
+                
+                const duration = this.formatDuration(course.duration || 0);
+                document.getElementById('courseDuration').textContent = duration;
+                document.getElementById('courseLevel').textContent = this.translateLevel(course.level);
+                document.getElementById('courseStudents').textContent = course.studentsCount || 0;
+
+                // Update instructor
+                document.getElementById('instructorName').textContent = course.instructor;
+                const avatar = document.getElementById('instructorAvatar');
+                avatar.textContent = this.getInstructorInitials(course.instructor);
+
+                // Update tags
+                if (course.tags && course.tags.length > 0) {
+                    this.renderTags(course.tags);
+                }
+
+                // Show content
+                document.getElementById('courseContent').style.display = 'block';
+            }
+
+            static setupVideo(videoUrl, imageUrl) {
+                const container = document.getElementById('courseVideoContainer');
+                const placeholder = document.getElementById('videoPlaceholder');
+
+                if (videoUrl) {
+                    placeholder.addEventListener('click', () => {
+                        container.innerHTML = `
+                            <video class="course-video" controls autoplay>
+                                <source src="${videoUrl}" type="video/mp4">
+                                Trình duyệt của bạn không hỗ trợ video.
+                            </video>
+                        `;
+                    });
+
+                    // Set background image if available
+                    if (imageUrl) {
+                        container.style.backgroundImage = `url(${imageUrl})`;
+                        container.style.backgroundSize = 'cover';
+                        container.style.backgroundPosition = 'center';
+                    }
+                } else if (imageUrl) {
+                    container.innerHTML = `
+                        <img src="${imageUrl}" alt="Course Image" style="width: 100%; height: 100%; object-fit: cover;">
+                    `;
+                } else {
+                    placeholder.innerHTML = `
+                        <i class="fas fa-image"></i>
+                        <p style="margin-top: 1rem; font-size: 1rem;">Chưa có video giới thiệu</p>
+                    `;
+                }
+            }
+
+            static updateStars(rating) {
+                const starsContainer = document.getElementById('courseStarsHeader');
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                
+                let starsHTML = '';
+                
+                for (let i = 0; i < 5; i++) {
+                    if (i < fullStars) {
+                        starsHTML += '<i class="fas fa-star"></i>';
+                    } else if (i === fullStars && hasHalfStar) {
+                        starsHTML += '<i class="fas fa-star-half-alt"></i>';
+                    } else {
+                        starsHTML += '<i class="far fa-star"></i>';
+                    }
+                }
+                
+                starsContainer.innerHTML = starsHTML;
+            }
+
+            static renderTags(tags) {
+                const tagsContainer = document.getElementById('courseTags');
+                const tagsSection = document.getElementById('courseTagsSection');
+                
+                tagsContainer.innerHTML = tags.map(tag => `
+                    <span class="course-tag">${tag}</span>
+                `).join('');
+                
+                tagsSection.style.display = 'block';
+            }
+
+            static async loadRelatedCourses(category, currentCourseId) {
+                try {
+                    const response = await APIService.getCoursesByCategory(category, {
+                        limit: 3,
+                        published: true
+                    });
+                    
+                    if (response.success) {
+                        const relatedCourses = response.data.courses
+                            .filter(course => course._id !== currentCourseId)
+                            .slice(0, 3);
+                        
+                        if (relatedCourses.length > 0) {
+                            this.renderRelatedCourses(relatedCourses);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading related courses:', error);
+                }
+            }
+
+            static renderRelatedCourses(courses) {
+                const grid = document.getElementById('relatedCoursesGrid');
+                
+                grid.innerHTML = courses.map(course => `
+                    <div class="course-card" onclick="window.location.href='course-detail.html?id=${course._id}'">
+                        <div class="course-image">
+                            ${course.image ? 
+                                `<img src="${course.image}" alt="${course.name}">` :
+                                `<div class="course-image-placeholder">
+                                    <i class="fas fa-play-circle"></i>
+                                 </div>`
+                            }
+                            <div class="course-level ${course.level.toLowerCase()}">${this.translateLevel(course.level)}</div>
+                        </div>
+                        <div class="course-content">
+                            <div class="course-category">${course.category}</div>
+                            <h3 class="course-title">${course.name}</h3>
+                            <p class="course-description">${course.description}</p>
+                            <div class="course-footer">
+                                <div class="course-price">${course.price ? course.price.toLocaleString('vi-VN') + ' VND' : 'Miễn phí'}</div>
+                                <div class="course-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>${course.rating || '5.0'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            static formatDuration(minutes) {
+                if (!minutes) return '0h 0m';
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+            }
+
+            static translateLevel(level) {
+                const levels = {
+                    'Beginner': 'Cơ bản',
+                    'Intermediate': 'Trung bình',
+                    'Advanced': 'Nâng cao'
+                };
+                return levels[level] || level;
+            }
+
+            static getInstructorInitials(name) {
+                return name.split(' ')
+                    .map(word => word.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+            }
+
+            static hideLoading() {
+                document.getElementById('courseLoading').style.display = 'none';
+            }
+
+            static showError() {
+                document.getElementById('courseLoading').style.display = 'none';
+                document.getElementById('courseError').style.display = 'block';
+            }
+        }
+
+        // Global functions
+        async function enrollCourse() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Bạn cần đăng nhập để đăng ký khóa học');
+                window.location.href = '/auth.html';
+                return;
+            }
+
+            const btn = document.querySelector('.btn-enroll');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            btn.disabled = true;
+            
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseId = urlParams.get('id') || urlParams.get('course');
+                
+                const response = await fetch('/api/enrollments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        courseId: courseId
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Đăng ký thành công! Chúc mừng bạn đã tham gia khóa học.');
+                    
+                    // Thay đổi nút thành "Học khóa học"
+                    btn.innerHTML = '<i class="fas fa-play-circle"></i> Học khóa học';
+                    btn.style.background = 'linear-gradient(135deg, var(--success-color), #27ae60)';
+                    btn.onclick = () => CourseDetailManager.startLearning(courseId);
+                    
+                } else {
+                    alert(result.message || 'Có lỗi xảy ra khi đăng ký khóa học');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+                
+            } catch (error) {
+                console.error('Error enrolling course:', error);
+                alert('Có lỗi xảy ra khi đăng ký khóa học');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function addToWishlist() {
+            const btn = document.querySelector('.btn-wishlist');
+            const isAdded = btn.innerHTML.includes('check');
+            
+            if (isAdded) {
+                btn.innerHTML = '<i class="fas fa-heart"></i> Thêm vào yêu thích';
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--primary-color)';
+            } else {
+                btn.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
+                btn.style.background = 'var(--success-color)';
+                btn.style.color = 'white';
+                btn.style.borderColor = 'var(--success-color)';
+            }
+        }
+
+
+
+        // Comments Manager
+        class CommentsManager {
+            static currentCourseId = null;
+            static currentPage = 1;
+            static currentSort = 'createdAt-desc';
+            static isLoggedIn = false;
+            static currentUser = null;
+            static editingCommentId = null;
+            static replyingToCommentId = null;
+
+            static async init(courseId) {
+                this.currentCourseId = courseId;
+                
+                // Check if user is logged in
+                const token = localStorage.getItem('token');
+                if (token) {
+                    try {
+                        const response = await APIService.getCurrentUser();
+                        if (response.success) {
+                            this.isLoggedIn = true;
+                            this.currentUser = response.data;
+                            this.setupCommentForm();
+                        }
+                    } catch (error) {
+                        console.log('User not logged in');
+                    }
+                }
+
+                if (!this.isLoggedIn) {
+                    this.showLoginPrompt();
+                }
+
+                // Setup character counter
+                const textarea = document.getElementById('commentContent');
+                if (textarea) {
+                    textarea.addEventListener('input', this.updateCharCount.bind(this));
+                }
+
+                // Load comments
+                await this.loadComments();
+            }
+
+            static setupCommentForm() {
+                const formElement = document.getElementById('commentForm');
+                if (formElement) {
+                    formElement.classList.remove('not-logged-in');
+                }
+            }
+
+            static showLoginPrompt() {
+                const formElement = document.getElementById('commentForm');
+                if (formElement) {
+                    formElement.classList.add('not-logged-in');
+                    formElement.innerHTML = `
+                        <div class="not-logged-in-content">
+                            <i class="fas fa-user-lock" style="font-size: 2rem; color: #ddd; margin-bottom: 1rem;"></i>
+                            <h3>Đăng nhập để bình luận</h3>
+                            <p>Bạn cần đăng nhập để có thể bình luận về khóa học này.</p>
+                            <a href="/auth.html" class="btn-comment">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Đăng nhập
+                            </a>
+                        </div>
+                    `;
+                }
+            }
+
+            static updateCharCount() {
+                const textarea = document.getElementById('commentContent');
+                const counter = document.getElementById('commentCharCount');
+                if (textarea && counter) {
+                    counter.textContent = textarea.value.length;
+                    
+                    // Change color when approaching limit
+                    if (textarea.value.length > 900) {
+                        counter.style.color = 'var(--error-color)';
+                    } else if (textarea.value.length > 700) {
+                        counter.style.color = 'var(--warning-color)';
+                    } else {
+                        counter.style.color = 'var(--text-muted)';
+                    }
+                }
+            }
+
+            static async loadComments() {
+                try {
+                    const loading = document.getElementById('commentsLoading');
+                    const commentsList = document.getElementById('commentsList');
+                    
+                    if (loading) loading.style.display = 'block';
+
+                    const [sortBy, sortOrder] = this.currentSort.split('-');
+                    const response = await fetch(`/api/courses/${this.currentCourseId}/comments?page=${this.currentPage}&limit=10&sortBy=${sortBy}&sortOrder=${sortOrder}`);
+                    const result = await response.json();
+
+                    if (loading) loading.style.display = 'none';
+
+                    if (result.success) {
+                        this.renderComments(result.data.comments);
+                        this.updateCommentsCount(result.data.pagination.total);
+                        this.renderPagination(result.data.pagination);
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error loading comments:', error);
+                    this.showCommentsError();
+                }
+            }
+
+            static renderComments(comments) {
+                const commentsList = document.getElementById('commentsList');
+                
+                if (!commentsList) return;
+
+                if (comments.length === 0) {
+                    commentsList.innerHTML = `
+                        <div class="comments-empty">
+                            <i class="fas fa-comments"></i>
+                            <h3>Chưa có bình luận nào</h3>
+                            <p>Hãy là người đầu tiên bình luận về khóa học này!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                commentsList.innerHTML = comments.map(comment => this.renderComment(comment)).join('');
+            }
+
+            static renderComment(comment) {
+                const isOwner = this.currentUser && this.currentUser._id === comment.user._id;
+                const isLiked = this.currentUser && comment.likes.some(like => like.user._id === this.currentUser._id);
+                
+                return `
+                    <div class="comment" data-comment-id="${comment._id}">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <div class="comment-avatar">
+                                    ${this.getInitials(comment.user.name)}
+                                </div>
+                                <div class="comment-author-info">
+                                    <h4>${this.escapeHtml(comment.user.name)}</h4>
+                                    <div class="comment-time">${this.formatTimeAgo(comment.createdAt)}</div>
+                                    ${comment.isEdited ? '<div class="comment-edited">(đã chỉnh sửa)</div>' : ''}
+                                </div>
+                            </div>
+                            ${isOwner ? `
+                                <div class="comment-actions">
+                                    <button class="comment-action-btn" onclick="CommentsManager.editComment('${comment._id}', '${this.escapeHtml(comment.content)}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="comment-action-btn" onclick="CommentsManager.deleteComment('${comment._id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="comment-content" id="comment-content-${comment._id}">
+                            ${this.escapeHtml(comment.content)}
+                        </div>
+
+                        <div class="comment-footer">
+                            <div class="comment-stats">
+                                <div class="comment-likes">
+                                    <i class="fas fa-heart"></i>
+                                    <span>${comment.likesCount || 0}</span>
+                                </div>
+                                ${comment.repliesCount > 0 ? `
+                                    <div class="comment-replies">
+                                        <i class="fas fa-reply"></i>
+                                        <span>${comment.repliesCount} phản hồi</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="comment-reply-actions">
+                                ${this.isLoggedIn ? `
+                                    <button class="btn-reply" onclick="CommentsManager.toggleLike('${comment._id}')">
+                                        <i class="fas fa-heart ${isLiked ? 'liked' : ''}"></i>
+                                        ${isLiked ? 'Bỏ thích' : 'Thích'}
+                                    </button>
+                                    <button class="btn-reply" onclick="CommentsManager.showReplyForm('${comment._id}')">
+                                        <i class="fas fa-reply"></i>
+                                        Trả lời
+                                    </button>
+                                ` : ''}
+                                ${comment.repliesCount > 0 ? `
+                                    <button class="replies-toggle" onclick="CommentsManager.toggleReplies('${comment._id}')">
+                                        <i class="fas fa-chevron-down"></i>
+                                        Xem phản hồi
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Replies Section -->
+                        <div class="replies-section" id="replies-${comment._id}" style="display: none;">
+                            <!-- Replies will be loaded here -->
+                        </div>
+                    </div>
+                `;
+            }
+
+            static async submitComment() {
+                if (!this.isLoggedIn) {
+                    alert('Bạn cần đăng nhập để bình luận');
+                    return;
+                }
+
+                const textarea = document.getElementById('commentContent');
+                const content = textarea.value.trim();
+
+                if (!content) {
+                    alert('Vui lòng nhập nội dung bình luận');
+                    return;
+                }
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const url = this.editingCommentId 
+                        ? `/api/comments/${this.editingCommentId}`
+                        : `/api/courses/${this.currentCourseId}/comments`;
+                    
+                    const method = this.editingCommentId ? 'PUT' : 'POST';
+                    const body = { 
+                        content,
+                        ...(this.replyingToCommentId && { parentComment: this.replyingToCommentId })
+                    };
+
+                    const response = await fetch(url, {
+                        method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        textarea.value = '';
+                        this.updateCharCount();
+                        this.cancelComment();
+                        await this.loadComments();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra');
+                    }
+                } catch (error) {
+                    console.error('Error submitting comment:', error);
+                    alert('Có lỗi xảy ra khi gửi bình luận');
+                }
+            }
+
+            static editComment(commentId, content) {
+                this.editingCommentId = commentId;
+                const textarea = document.getElementById('commentContent');
+                const cancelBtn = document.querySelector('.btn-cancel');
+                const submitBtn = document.querySelector('.btn-comment');
+
+                if (textarea) {
+                    textarea.value = content;
+                    textarea.focus();
+                    this.updateCharCount();
+                }
+
+                if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-save"></i> Cập nhật';
+            }
+
+            static cancelComment() {
+                this.editingCommentId = null;
+                this.replyingToCommentId = null;
+                
+                const textarea = document.getElementById('commentContent');
+                const cancelBtn = document.querySelector('.btn-cancel');
+                const submitBtn = document.querySelector('.btn-comment');
+
+                if (textarea) textarea.value = '';
+                if (cancelBtn) cancelBtn.style.display = 'none';
+                if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Gửi bình luận';
+
+                this.updateCharCount();
+            }
+
+            static async deleteComment(commentId) {
+                if (!confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/comments/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        await this.loadComments();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra');
+                    }
+                } catch (error) {
+                    console.error('Error deleting comment:', error);
+                    alert('Có lỗi xảy ra khi xóa bình luận');
+                }
+            }
+
+            static async toggleLike(commentId) {
+                if (!this.isLoggedIn) return;
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/comments/${commentId}/like`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Update the UI without full reload
+                        const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+                        if (commentElement) {
+                            const likesElement = commentElement.querySelector('.comment-likes span');
+                            const likeBtn = commentElement.querySelector('.btn-reply .fa-heart');
+                            
+                            if (likesElement) likesElement.textContent = result.data.likesCount;
+                            if (likeBtn) {
+                                likeBtn.classList.toggle('liked', result.data.isLiked);
+                                const btnText = likeBtn.parentElement;
+                                btnText.innerHTML = `<i class="fas fa-heart ${result.data.isLiked ? 'liked' : ''}"></i> ${result.data.isLiked ? 'Bỏ thích' : 'Thích'}`;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error toggling like:', error);
+                }
+            }
+
+            static async changeSortOrder() {
+                const sortSelect = document.getElementById('commentSort');
+                this.currentSort = sortSelect.value;
+                this.currentPage = 1;
+                await this.loadComments();
+            }
+
+            static updateCommentsCount(count) {
+                const countElement = document.getElementById('commentsCount');
+                if (countElement) {
+                    countElement.textContent = count;
+                }
+            }
+
+            static renderPagination(pagination) {
+                const paginationElement = document.getElementById('commentsPagination');
+                if (!paginationElement) return;
+
+                if (pagination.pages <= 1) {
+                    paginationElement.style.display = 'none';
+                    return;
+                }
+
+                paginationElement.style.display = 'flex';
+                
+                let html = '';
+                
+                // Previous button
+                html += `<button class="pagination-btn" ${!pagination.hasPrev ? 'disabled' : ''} onclick="CommentsManager.goToPage(${pagination.current - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>`;
+
+                // Page numbers
+                for (let i = 1; i <= pagination.pages; i++) {
+                    if (i === pagination.current) {
+                        html += `<button class="pagination-btn active">${i}</button>`;
+                    } else if (i === 1 || i === pagination.pages || Math.abs(i - pagination.current) <= 2) {
+                        html += `<button class="pagination-btn" onclick="CommentsManager.goToPage(${i})">${i}</button>`;
+                    } else if (i === pagination.current - 3 || i === pagination.current + 3) {
+                        html += `<span class="pagination-dots">...</span>`;
+                    }
+                }
+
+                // Next button
+                html += `<button class="pagination-btn" ${!pagination.hasNext ? 'disabled' : ''} onclick="CommentsManager.goToPage(${pagination.current + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>`;
+
+                paginationElement.innerHTML = html;
+            }
+
+            static async goToPage(page) {
+                this.currentPage = page;
+                await this.loadComments();
+            }
+
+            static async toggleReplies(commentId) {
+                const repliesSection = document.getElementById(`replies-${commentId}`);
+                const toggleBtn = document.querySelector(`[onclick="CommentsManager.toggleReplies('${commentId}')"]`);
+                
+                if (!repliesSection) {
+                    console.error('Replies section not found for commentId:', commentId);
+                    return;
+                }
+
+                if (repliesSection.style.display === 'none' || !repliesSection.style.display) {
+                    // Show loading state
+                    repliesSection.innerHTML = '<div style="text-align: center; padding: 1rem;"><i class="fas fa-spinner fa-spin"></i> Đang tải phản hồi...</div>';
+                    repliesSection.style.display = 'block';
+                    
+                    try {
+                        const response = await fetch(`/api/comments/${commentId}/replies`);
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            // The API returns data in format: { replies: [...], pagination: {...} }
+                            const replies = result.data.replies || [];
+                            
+                            if (replies.length > 0) {
+                                repliesSection.innerHTML = replies.map(reply => this.renderReply(reply)).join('');
+                                
+                                if (toggleBtn) {
+                                    toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Ẩn phản hồi';
+                                }
+                            } else {
+                                repliesSection.innerHTML = '<div style="text-align: center; padding: 1rem; color: #666;">Chưa có phản hồi nào</div>';
+                            }
+                        } else {
+                            repliesSection.innerHTML = '<div style="text-align: center; padding: 1rem; color: #666;">Không thể tải phản hồi</div>';
+                        }
+                    } catch (error) {
+                        console.error('Error loading replies:', error);
+                        repliesSection.innerHTML = '<div style="text-align: center; padding: 1rem; color: #666;">Lỗi khi tải phản hồi</div>';
+                    }
+                } else {
+                    // Hide replies
+                    repliesSection.style.display = 'none';
+                    if (toggleBtn) {
+                        toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Xem phản hồi';
+                    }
+                }
+            }
+
+            static showReplyForm(commentId) {
+                if (!this.isLoggedIn) {
+                    alert('Bạn cần đăng nhập để trả lời bình luận');
+                    return;
+                }
+
+                // Remove existing reply forms
+                document.querySelectorAll('.reply-form').forEach(form => form.remove());
+
+                // Create reply form
+                const replyForm = document.createElement('div');
+                replyForm.className = 'reply-form';
+                replyForm.innerHTML = `
+                    <textarea 
+                        id="reply-content-${commentId}" 
+                        placeholder="Viết phản hồi của bạn..."
+                        maxlength="500"
+                        rows="3">
+                    </textarea>
+                    <div class="comment-form-footer">
+                        <div class="comment-char-count">
+                            <span id="reply-char-count-${commentId}">0</span>/500
+                        </div>
+                        <div class="comment-form-actions">
+                            <button type="button" class="btn-cancel" onclick="CommentsManager.cancelReply('${commentId}')">
+                                Hủy
+                            </button>
+                            <button type="button" class="btn-comment" onclick="CommentsManager.submitReply('${commentId}')">
+                                <i class="fas fa-paper-plane"></i>
+                                Gửi phản hồi
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Insert reply form after the comment
+                const comment = document.querySelector(`[data-comment-id="${commentId}"]`);
+                if (comment) {
+                    comment.appendChild(replyForm);
+                    
+                    // Setup character counter for reply
+                    const textarea = document.getElementById(`reply-content-${commentId}`);
+                    const counter = document.getElementById(`reply-char-count-${commentId}`);
+                    
+                    textarea.addEventListener('input', () => {
+                        counter.textContent = textarea.value.length;
+                        if (textarea.value.length > 400) {
+                            counter.style.color = 'var(--error-color)';
+                        } else if (textarea.value.length > 300) {
+                            counter.style.color = 'var(--warning-color)';
+                        } else {
+                            counter.style.color = 'var(--text-muted)';
+                        }
+                    });
+                    
+                    textarea.focus();
+                }
+            }
+
+            static cancelReply(commentId) {
+                const replyForm = document.querySelector(`[data-comment-id="${commentId}"] .reply-form`);
+                if (replyForm) {
+                    replyForm.remove();
+                }
+            }
+
+            static async submitReply(commentId) {
+                const textarea = document.getElementById(`reply-content-${commentId}`);
+                const content = textarea.value.trim();
+
+                if (!content) {
+                    alert('Vui lòng nhập nội dung phản hồi');
+                    return;
+                }
+
+                try {
+                    const token = localStorage.getItem('token');
+                    // Use the same endpoint as creating comments, but with parentComment field
+                    const response = await fetch(`/api/courses/${this.currentCourseId}/comments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ 
+                            content,
+                            parentComment: commentId
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.cancelReply(commentId);
+                        // Reload replies
+                        const repliesSection = document.getElementById(`replies-${commentId}`);
+                        if (repliesSection && repliesSection.style.display !== 'none') {
+                            await this.toggleReplies(commentId); // Hide
+                            await this.toggleReplies(commentId); // Show with new reply
+                        }
+                        // Also reload main comments to update reply count
+                        await this.loadComments();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra khi gửi phản hồi');
+                    }
+                } catch (error) {
+                    console.error('Error submitting reply:', error);
+                    alert('Có lỗi xảy ra khi gửi phản hồi');
+                }
+            }
+
+            static renderReply(reply) {
+                const isOwner = this.currentUser && this.currentUser._id === reply.user._id;
+                const isLiked = this.currentUser && reply.likes.some(like => like.user._id === this.currentUser._id);
+                
+                return `
+                    <div class="comment reply" data-comment-id="${reply._id}">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <div class="comment-avatar">
+                                    ${this.getInitials(reply.user.name)}
+                                </div>
+                                <div class="comment-author-info">
+                                    <h4>${this.escapeHtml(reply.user.name)}</h4>
+                                    <div class="comment-time">${this.formatTimeAgo(reply.createdAt)}</div>
+                                    ${reply.isEdited ? '<div class="comment-edited">(đã chỉnh sửa)</div>' : ''}
+                                </div>
+                            </div>
+                            ${isOwner ? `
+                                <div class="comment-actions">
+                                    <button class="comment-action-btn" onclick="CommentsManager.editReply('${reply._id}', '${this.escapeHtml(reply.content)}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="comment-action-btn" onclick="CommentsManager.deleteReply('${reply._id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="comment-content" id="reply-content-${reply._id}">
+                            ${this.escapeHtml(reply.content)}
+                        </div>
+
+                        <div class="comment-footer">
+                            <div class="comment-stats">
+                                <div class="comment-likes">
+                                    <i class="fas fa-heart"></i>
+                                    <span>${reply.likesCount || 0}</span>
+                                </div>
+                            </div>
+                            
+                            ${this.isLoggedIn ? `
+                                <div class="comment-reply-actions">
+                                    <button class="btn-reply" onclick="CommentsManager.toggleLike('${reply._id}')">
+                                        <i class="fas fa-heart ${isLiked ? 'liked' : ''}"></i>
+                                        ${isLiked ? 'Bỏ thích' : 'Thích'}
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            static async editReply(replyId, content) {
+                // Similar to editComment but for replies
+                this.editingCommentId = replyId;
+                
+                // Find the reply element and replace content with textarea
+                const contentElement = document.getElementById(`reply-content-${replyId}`);
+                if (contentElement) {
+                    const originalContent = contentElement.innerHTML;
+                    contentElement.innerHTML = `
+                        <textarea id="edit-reply-${replyId}" class="comment-edit-textarea" maxlength="500">${content}</textarea>
+                        <div class="comment-form-actions" style="margin-top: 0.5rem;">
+                            <button class="btn-cancel" onclick="CommentsManager.cancelEditReply('${replyId}', \`${originalContent.replace(/`/g, '\\`')}\`)">Hủy</button>
+                            <button class="btn-comment" onclick="CommentsManager.saveEditReply('${replyId}')">Lưu</button>
+                        </div>
+                    `;
+                    
+                    document.getElementById(`edit-reply-${replyId}`).focus();
+                }
+            }
+
+            static cancelEditReply(replyId, originalContent) {
+                const contentElement = document.getElementById(`reply-content-${replyId}`);
+                if (contentElement) {
+                    contentElement.innerHTML = originalContent;
+                }
+                this.editingCommentId = null;
+            }
+
+            static async saveEditReply(replyId) {
+                const textarea = document.getElementById(`edit-reply-${replyId}`);
+                const content = textarea.value.trim();
+
+                if (!content) {
+                    alert('Vui lòng nhập nội dung phản hồi');
+                    return;
+                }
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/comments/${replyId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ content })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Update the content
+                        const contentElement = document.getElementById(`reply-content-${replyId}`);
+                        if (contentElement) {
+                            contentElement.innerHTML = this.escapeHtml(content);
+                        }
+                        this.editingCommentId = null;
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra khi cập nhật phản hồi');
+                    }
+                } catch (error) {
+                    console.error('Error updating reply:', error);
+                    alert('Có lỗi xảy ra khi cập nhật phản hồi');
+                }
+            }
+
+            static async deleteReply(replyId) {
+                if (!confirm('Bạn có chắc muốn xóa phản hồi này?')) return;
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/comments/${replyId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Remove the reply element
+                        const replyElement = document.querySelector(`[data-comment-id="${replyId}"]`);
+                        if (replyElement) {
+                            replyElement.remove();
+                        }
+                        
+                        // Reload main comments to update reply counts
+                        await this.loadComments();
+                    } else {
+                        alert(result.message || 'Có lỗi xảy ra khi xóa phản hồi');
+                    }
+                } catch (error) {
+                    console.error('Error deleting reply:', error);
+                    alert('Có lỗi xảy ra khi xóa phản hồi');
+                }
+            }
+
+            static showCommentsError() {
+                const commentsList = document.getElementById('commentsList');
+                if (commentsList) {
+                    commentsList.innerHTML = `
+                        <div class="comments-empty">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Không thể tải bình luận</h3>
+                            <p>Đã xảy ra lỗi khi tải bình luận. Vui lòng thử lại sau.</p>
+                            <button class="btn-comment" onclick="CommentsManager.loadComments()">Thử lại</button>
+                        </div>
+                    `;
+                }
+            }
+
+            // Utility functions
+            static getInitials(name) {
+                return name.split(' ')
+                    .map(word => word.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+            }
+
+            static escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            static formatTimeAgo(dateString) {
+                const now = new Date();
+                const date = new Date(dateString);
+                const diff = now - date;
+                
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (days > 0) return `${days} ngày trước`;
+                if (hours > 0) return `${hours} giờ trước`;
+                if (minutes > 0) return `${minutes} phút trước`;
+                return 'Vừa xong';
+            }
+        }
+
+        // Chat Modal Functions
+        let socket = null;
+        let currentConversation = null;
+        let currentUser = null;
+
+        function openChatModal() {
+            console.log('🎯 Opening chat modal...');
+            
+            // Kiểm tra đăng nhập
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log('❌ No token found');
+                alert('Bạn cần đăng nhập để sử dụng chức năng chat');
+                window.location.href = '/auth.html';
+                return;
+            }
+            console.log('✅ Token found');
+
+            // Lấy thông tin user
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                console.log('✅ User data loaded:', currentUser);
+            }
+
+            // Hiển thị modal
+            const modal = document.getElementById('chatModal');
+            if (!modal) {
+                console.error('❌ Chat modal element not found!');
+                return;
+            }
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+            console.log('✅ Modal displayed');
+
+            // Kết nối Socket.IO nếu chưa kết nối
+            if (!socket) {
+                console.log('🔌 Initializing socket connection...');
+                initializeSocket();
+            } else {
+                console.log('✅ Socket already connected');
+            }
+
+            // Tải cuộc trò chuyện
+            console.log('📚 Loading conversation...');
+            loadChatConversation();
+        }
+
+        function closeChatModal() {
+            const modal = document.getElementById('chatModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function initializeSocket() {
+            console.log('🚀 Initializing Socket.IO...');
+            console.log('io available:', typeof io !== 'undefined');
+            
+            if (typeof io === 'undefined') {
+                console.error('❌ Socket.IO not loaded! Script may have failed to load.');
+                alert('Lỗi: Socket.IO không thể kết nối. Vui lòng reload trang.');
+                return;
+            }
+            
+            socket = io('http://localhost:3000', {
+                auth: {
+                    token: localStorage.getItem('token')
+                }
+            });
+
+            socket.on('connect', () => {
+                console.log('✅ Socket connected:', socket.id);
+            });
+
+            socket.on('newMessage', (message) => {
+                console.log('📨 New message received:', message);
+                displayMessage(message);
+            });
+
+            socket.on('error', (error) => {
+                console.error('❌ Socket error:', error);
+            });
+        }
+
+        async function loadChatConversation() {
+            try {
+                const token = localStorage.getItem('token');
+                let courseId = CourseDetailManager.currentCourseId;
+                
+                // Fallback: try to get courseId from URL
+                if (!courseId) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    courseId = urlParams.get('id');
+                }
+
+                console.log('🔍 Loading conversation for courseId:', courseId);
+                
+                if (!courseId) {
+                    console.error('❌ Course ID not found in manager or URL');
+                    alert('Không thể xác định khóa học. Vui lòng reload trang.');
+                    return;
+                }
+
+                // Sử dụng route có sẵn để get or create conversation
+                console.log('📡 Getting or creating conversation...');
+                const response = await fetch(`/api/chat/conversations/${courseId}/instructor`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('📡 Response status:', response.status);
+                const result = await response.json();
+                console.log('📡 Response data:', result);
+                
+                if (result.success) {
+                    console.log('✅ Conversation ready');
+                    currentConversation = result.data;
+                    loadMessages();
+                } else {
+                    console.error('❌ Failed to get/create conversation:', result.message);
+                    alert(`Không thể tạo cuộc trò chuyện: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading conversation:', error);
+                alert('Không thể tải cuộc trò chuyện. Vui lòng thử lại.');
+            }
+        }
+
+        async function loadMessages() {
+            try {
+                if (!currentConversation) {
+                    console.error('❌ No conversation to load messages from');
+                    return;
+                }
+
+                console.log('📨 Loading messages for conversation:', currentConversation._id);
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/chat/conversations/${currentConversation._id}/messages`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('📨 Messages response status:', response.status);
+                const result = await response.json();
+                console.log('📨 Messages response data:', result);
+                
+                if (result.success) {
+                    const messagesContainer = document.getElementById('chatMessages');
+                    
+                    // Xử lý trường hợp result.data có thể là array hoặc object
+                    let messages = result.data;
+                    if (!Array.isArray(messages)) {
+                        // Nếu data không phải array, có thể nó là object chứa messages
+                        if (messages && messages.messages && Array.isArray(messages.messages)) {
+                            messages = messages.messages;
+                        } else {
+                            console.log('📨 No messages found or data is not an array');
+                            messages = [];
+                        }
+                    }
+                    
+                    console.log('📨 Processing', messages.length, 'messages');
+                    
+                    if (messages.length === 0) {
+                        messagesContainer.innerHTML = `
+                            <div class="chat-empty">
+                                <i class="fas fa-comment-dots"></i>
+                                <h4>Chào mừng bạn!</h4>
+                                <p>Hãy bắt đầu cuộc trò chuyện với giảng viên</p>
+                            </div>
+                        `;
+                    } else {
+                        messagesContainer.innerHTML = '';
+                        messages.forEach(message => {
+                            displayMessage(message);
+                        });
+                        scrollToBottom();
+                    }
+                } else {
+                    console.error('❌ Failed to load messages:', result.message);
+                }
+            } catch (error) {
+                console.error('❌ Error loading messages:', error);
+            }
+        }
+
+        function displayMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Xóa empty state nếu có
+            const emptyState = messagesContainer.querySelector('.chat-empty');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const isOwn = currentUser && message.sender._id === currentUser.id;
+            const senderName = message.sender.name || message.sender.username;
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `chat-message ${isOwn ? 'own' : ''}`;
+            
+            messageElement.innerHTML = `
+                <div class="message-avatar">
+                    ${getInitials(senderName)}
+                </div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        ${escapeHtml(message.content)}
+                    </div>
+                    <div class="message-time">
+                        ${formatTimeAgo(message.createdAt)}
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+            
+            const input = document.getElementById('chatInput');
+            const content = input.value.trim();
+            
+            console.log('📤 Attempting to send message:', content);
+            
+            if (!content) {
+                console.log('❌ Empty message, aborting');
+                return;
+            }
+            
+            if (!currentConversation) {
+                console.error('❌ No conversation available');
+                alert('Không thể gửi tin nhắn. Vui lòng thử lại.');
+                return;
+            }
+
+            console.log('📤 Sending to conversation:', currentConversation._id);
+
+            // Disable input
+            const sendButton = document.getElementById('sendButton');
+            input.disabled = true;
+            sendButton.disabled = true;
+
+            try {
+                const token = localStorage.getItem('token');
+                const url = `/api/chat/conversations/${currentConversation._id}/messages`;
+                console.log('📤 POST to:', url);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        content: content
+                    })
+                });
+
+                console.log('📤 Send response status:', response.status);
+                const result = await response.json();
+                console.log('📤 Send response data:', result);
+                
+                if (result.success) {
+                    console.log('✅ Message sent successfully');
+                    input.value = '';
+                    
+                    // Reload messages để hiển thị tin nhắn mới
+                    if (currentConversation) {
+                        console.log('🔄 Reloading messages...');
+                        loadMessages();
+                    }
+                } else {
+                    console.error('❌ Send failed:', result.message);
+                    alert(result.message || 'Có lỗi xảy ra khi gửi tin nhắn');
+                }
+            } catch (error) {
+                console.error('❌ Error sending message:', error);
+                alert('Có lỗi xảy ra khi gửi tin nhắn');
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                sendButton.disabled = false;
+                input.focus();
+            }
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getInitials(name) {
+            return name.split(' ')
+                .map(word => word.charAt(0))
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatTimeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diff = now - date;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (days > 0) return `${days} ngày trước`;
+            if (hours > 0) return `${hours} giờ trước`;
+            if (minutes > 0) return `${minutes} phút trước`;
+            return 'Vừa xong';
+        }
+
+        // Auto-resize textarea
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('chatInput');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                });
+
+                // Submit on Enter, new line on Shift+Enter
+                textarea.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage(e);
+                    }
+                });
+            }
+        });
+
+        // Close modal on click outside
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('chatModal');
+            if (e.target === modal) {
+                closeChatModal();
+            }
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📚 Course Detail Page Initialized');
+            
+            // Check Socket.IO availability
+            if (typeof io !== 'undefined') {
+                console.log('✅ Socket.IO loaded successfully');
+            } else {
+                console.error('❌ Socket.IO failed to load');
+            }
+            
+            CourseDetailManager.loadCourseDetail();
+        });
+    </script>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3>
+                    <i class="fas fa-comments"></i>
+                    Chat với giảng viên
+                </h3>
+                <button class="chat-close" onclick="closeChatModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-empty">
+                    <i class="fas fa-comment-dots"></i>
+                    <h4>Chào mừng bạn!</h4>
+                    <p>Hãy bắt đầu cuộc trò chuyện với giảng viên</p>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <form class="chat-form" onsubmit="sendMessage(event)">
+                    <textarea 
+                        class="chat-textarea" 
+                        id="chatInput" 
+                        placeholder="Nhập tin nhắn của bạn..."
+                        rows="1"
+                        maxlength="1000"
+                    ></textarea>
+                    <button type="submit" class="chat-send" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

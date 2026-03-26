@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DavaIT - Nền tảng học tập trực tuyến</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/auth.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1><i class="fas fa-graduation-cap"></i> DavaIT</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home" class="nav-link active">Trang chủ</a></li>
+                    <li><a href="#courses" class="nav-link">Khóa học</a></li>
+                    <li><a href="#about" class="nav-link">Giới thiệu</a></li>
+                    <li><a href="#contact" class="nav-link">Liên hệ</a></li>
+                    <!-- Default auth button (will be replaced by auth.js if user is logged in) -->
+                    <li class="auth-item default-auth">
+                        <a href="auth.html" class="nav-link auth-btn">
+                            <i class="fas fa-user"></i> Đăng nhập
+                        </a>
+                    </li>
+                    <!-- Auth items will be added here by auth.js -->
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        Học tập không giới hạn với
+                        <span class="highlight">DavaIT</span>
+                    </h1>
+                    <p class="hero-description">
+                        Khám phá hàng nghìn khóa học chất lượng cao từ các chuyên gia hàng đầu. 
+                        Nâng cao kỹ năng và phát triển sự nghiệp của bạn ngay hôm nay.
+                    </p>
+                    <div class="user-info" style="display: none;">
+                        <div class="welcome-message">
+                            <i class="fas fa-hand-wave"></i>
+                            <span>Chào mừng trở lại!</span>
+                        </div>
+                    </div>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="window.location.href='#courses'">
+                            <i class="fas fa-play"></i> Khám phá khóa học
+                        </button>
+                        <button class="btn btn-outline auth-button" onclick="window.location.href='auth.html'">
+                            <i class="fas fa-user-plus"></i> Đăng ký ngay
+                        </button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number" id="totalCourses">0</span>
+                            <span class="stat-label">Khóa học</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="totalStudents">0</span>
+                            <span class="stat-label">Học viên</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="avgRating">0</span>
+                            <span class="stat-label">Đánh giá</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-card">
+                        <i class="fas fa-laptop-code"></i>
+                        <h3>Lập trình</h3>
+                        <p>Học các ngôn ngữ lập trình hiện đại</p>
+                    </div>
+                    <div class="hero-card">
+                        <i class="fas fa-paint-brush"></i>
+                        <h3>Thiết kế</h3>
+                        <p>Phát triển kỹ năng thiết kế chuyên nghiệp</p>
+                    </div>
+                    <div class="hero-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Kinh doanh</h3>
+                        <p>Nâng cao kiến thức quản lý và marketing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section id="courses" class="courses-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Khóa học nổi bật</h2>
+                <p class="section-description">Khám phá các khóa học được đánh giá cao nhất</p>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">Tất cả</button>
+                <button class="filter-tab" data-filter="Programming">Lập trình</button>
+                <button class="filter-tab" data-filter="Design">Thiết kế</button>
+                <button class="filter-tab" data-filter="Business">Kinh doanh</button>
+                <button class="filter-tab" data-filter="Marketing">Marketing</button>
+                <button class="filter-tab" data-filter="Photography">Nhiếp ảnh</button>
+            </div>
+
+            <!-- Search and Sort -->
+            <div class="courses-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm khóa học...">
+                </div>
+                <div class="sort-options">
+                    <select id="sortSelect">
+                        <option value="newest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                        <option value="price-low">Giá thấp nhất</option>
+                        <option value="price-high">Giá cao nhất</option>
+                        <option value="rating">Đánh giá cao</option>
+                        <option value="students">Nhiều học viên</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Courses Grid -->
+            <div class="courses-grid" id="coursesGrid">
+                <!-- Courses will be loaded here -->
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải khóa học...</p>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more-container">
+                <button class="btn btn-outline" id="loadMoreBtn" style="display: none;">
+                    <i class="fas fa-plus"></i> Xem thêm khóa học
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">Tại sao chọn EduPlatform?</h2>
+                    <p class="section-description">
+                        Chúng tôi cam kết mang đến trải nghiệm học tập tốt nhất với các khóa học chất lượng cao 
+                        và phương pháp giảng dạy hiện đại.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Chất lượng cao</h3>
+                                <p>Khóa học được thiết kế bởi các chuyên gia hàng đầu trong lĩnh vực</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Học mọi lúc mọi nơi</h3>
+                                <p>Truy cập khóa học 24/7 từ mọi thiết bị, học theo tốc độ của bạn</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Chứng chỉ uy tín</h3>
+                                <p>Nhận chứng chỉ hoàn thành được công nhận trong ngành</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Cộng đồng học tập</h3>
+                                <p>Kết nối với hàng nghìn học viên và chia sẻ kinh nghiệm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="image-placeholder">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Liên hệ với chúng tôi</h2>
+                <p class="section-description">Có câu hỏi? Chúng tôi luôn sẵn sàng hỗ trợ bạn</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Địa chỉ</h3>
+                            <p>123 Đường ABC, Quận 1, TP.HCM</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Điện thoại</h3>
+                            <p>+84 123 456 789</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p>info@eduplatform.vn</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <input type="text" placeholder="Họ và tên" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" placeholder="Chủ đề">
+                    </div>
+                    <div class="form-group">
+                        <textarea placeholder="Tin nhắn" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Gửi tin nhắn
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-graduation-cap"></i> EduPlatform</h3>
+                    <p>Nền tảng học tập trực tuyến hàng đầu Việt Nam, mang đến cơ hội học tập chất lượng cao cho mọi người.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Khóa học</h4>
+                    <ul>
+                        <li><a href="#">Lập trình</a></li>
+                        <li><a href="#">Thiết kế</a></li>
+                        <li><a href="#">Kinh doanh</a></li>
+                        <li><a href="#">Marketing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Hỗ trợ</h4>
+                    <ul>
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                        <li><a href="#">Điều khoản</a></li>
+                        <li><a href="#">Chính sách</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Đăng ký nhận tin</h4>
+                    <p>Nhận thông tin về khóa học mới và ưu đãi đặc biệt</p>
+                    <div class="newsletter">
+                        <input type="email" placeholder="Email của bạn">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 EduPlatform. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Course Detail Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="courseModalContent">
+                <!-- Course detail content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

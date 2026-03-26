@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê học tập | EduPlatform</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    
+    <style>
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        .stats-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .stats-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .overview-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-large);
+        }
+
+        .overview-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem auto;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .overview-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .overview-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .courses-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .course-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .course-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .course-completion {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .course-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .course-stat {
+            text-align: center;
+        }
+
+        .course-stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .course-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .course-progress {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .course-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-continue {
+            flex: 1;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-continue:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-stats {
+            background: var(--border-color);
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-stats:hover {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .notes-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 2rem;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .note-item {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .note-item:hover {
+            background: white;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .note-item.yellow { border-left-color: #f1c40f; }
+        .note-item.blue { border-left-color: #3498db; }
+        .note-item.green { border-left-color: #2ecc71; }
+        .note-item.red { border-left-color: #e74c3c; }
+        .note-item.purple { border-left-color: #9b59b6; }
+        .note-item.orange { border-left-color: #e67e22; }
+        .note-item.pink { border-left-color: #e91e63; }
+        .note-item.gray { border-left-color: #95a5a6; }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-course {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .note-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .note-content {
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .note-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .note-tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            gap: 0.75rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .filter-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .filter-tab:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-container {
+                padding: 1rem;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-title {
+                font-size: 2rem;
+            }
+
+            .overview-card {
+                padding: 1.5rem;
+            }
+
+            .filter-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .filter-tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stats-container">
+        <!-- Header -->
+        <div class="stats-header">
+            <h1 class="stats-title">Thống kê học tập</h1>
+            <p class="stats-subtitle">Theo dõi tiến độ và thành tích học tập của bạn</p>
+        </div>
+
+        <!-- Overview Stats -->
+        <div class="overview-grid" id="overviewGrid">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                Đang tải thống kê...
+            </div>
+        </div>
+
+        <!-- Courses Section -->
+        <div class="courses-section">
+            <h2 class="section-title">
+                <i class="fas fa-graduation-cap"></i>
+                Khóa học của tôi
+            </h2>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="LearningStatsManager.filterCourses('all')">
+                    Tất cả
+                </button>
+                <button class="filter-tab" onclick="LearningStatsManager.filterCourses('in-progress')">
+                    Đang học
+                </button>
+                <button class="filter-tab" onclick="LearningStatsManager.filterCourses('completed')">
+                    Đã hoàn thành
+                </button>
+            </div>
+            
+            <div class="courses-grid" id="coursesGrid">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Đang tải khóa học...
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="notes-section">
+            <h2 class="section-title">
+                <i class="fas fa-sticky-note"></i>
+                Ghi chú gần đây
+            </h2>
+            
+            <div class="notes-grid" id="notesGrid">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Đang tải ghi chú...
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to courses -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/" class="btn-continue" style="display: inline-block; text-decoration: none; padding: 1rem 2rem;">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+
+    <script src="/assets/js/app.js"></script>
+    <script>
+        class LearningStatsManager {
+            static overallStats = {};
+            static courseStats = [];
+            static recentNotes = [];
+            static currentFilter = 'all';
+
+            static async init() {
+                try {
+                    // Kiểm tra đăng nhập
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        alert('Bạn cần đăng nhập để xem thống kê');
+                        window.location.href = '/auth.html';
+                        return;
+                    }
+
+                    await Promise.all([
+                        this.loadOverallStats(),
+                        this.loadCourseStats(),
+                        this.loadRecentNotes()
+                    ]);
+
+                } catch (error) {
+                    console.error('Error initializing stats:', error);
+                    this.showError('Có lỗi xảy ra khi tải thống kê học tập');
+                }
+            }
+
+            static async loadOverallStats() {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('/api/progress/stats', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.overallStats = result.data;
+                        this.renderOverallStats();
+                    }
+                } catch (error) {
+                    console.error('Error loading overall stats:', error);
+                }
+            }
+
+            static async loadCourseStats() {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('/api/progress/stats', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.courseStats = result.data.courses || [];
+                        this.renderCourseStats();
+                    }
+                } catch (error) {
+                    console.error('Error loading course stats:', error);
+                }
+            }
+
+            static async loadRecentNotes() {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('/api/notes?limit=12&sortBy=createdAt&order=desc', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.recentNotes = result.data.notes || [];
+                        this.renderRecentNotes();
+                    }
+                } catch (error) {
+                    console.error('Error loading recent notes:', error);
+                }
+            }
+
+            static renderOverallStats() {
+                const overviewGrid = document.getElementById('overviewGrid');
+                const stats = this.overallStats;
+
+                overviewGrid.innerHTML = `
+                    <div class="overview-card fade-in">
+                        <div class="overview-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="overview-value">${stats.totalCourses || 0}</div>
+                        <div class="overview-label">Khóa học tham gia</div>
+                    </div>
+                    
+                    <div class="overview-card fade-in" style="animation-delay: 0.1s;">
+                        <div class="overview-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="overview-value">${stats.completedLessons || 0}</div>
+                        <div class="overview-label">Bài học hoàn thành</div>
+                    </div>
+                    
+                    <div class="overview-card fade-in" style="animation-delay: 0.2s;">
+                        <div class="overview-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="overview-value">${stats.formattedWatchTime || '0 phút'}</div>
+                        <div class="overview-label">Thời gian học tập</div>
+                    </div>
+                    
+                    <div class="overview-card fade-in" style="animation-delay: 0.3s;">
+                        <div class="overview-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="overview-value">${stats.overallCompletion || 0}%</div>
+                        <div class="overview-label">Tiến độ tổng thể</div>
+                    </div>
+                `;
+            }
+
+            static renderCourseStats() {
+                const coursesGrid = document.getElementById('coursesGrid');
+                
+                if (this.courseStats.length === 0) {
+                    coursesGrid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h3>Chưa có khóa học nào</h3>
+                            <p>Bạn chưa tham gia khóa học nào. Hãy khám phá các khóa học mới!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const filteredCourses = this.filterCoursesByStatus(this.courseStats);
+                
+                coursesGrid.innerHTML = filteredCourses.map(course => `
+                    <div class="course-card slide-up">
+                        <div class="course-header">
+                            <h3 class="course-name">${this.escapeHtml(course.course.name)}</h3>
+                            <div class="course-completion">${course.completionPercentage}%</div>
+                        </div>
+                        
+                        <div class="course-stats">
+                            <div class="course-stat">
+                                <div class="course-stat-value">${course.completedLessons}</div>
+                                <div class="course-stat-label">Hoàn thành</div>
+                            </div>
+                            <div class="course-stat">
+                                <div class="course-stat-value">${course.totalLessons}</div>
+                                <div class="course-stat-label">Tổng bài</div>
+                            </div>
+                            <div class="course-stat">
+                                <div class="course-stat-value">${course.formattedWatchTime || '0m'}</div>
+                                <div class="course-stat-label">Thời gian</div>
+                            </div>
+                        </div>
+                        
+                        <div class="course-progress">
+                            <div class="course-progress-fill" style="width: ${course.completionPercentage}%"></div>
+                        </div>
+                        
+                        <div class="course-actions">
+                            <button class="btn-continue" onclick="LearningStatsManager.continueLearning('${course._id}')">
+                                <i class="fas fa-play"></i>
+                                ${course.completionPercentage === 100 ? 'Xem lại' : 'Tiếp tục học'}
+                            </button>
+                            <button class="btn-stats" onclick="LearningStatsManager.viewCourseDetails('${course._id}')" title="Xem chi tiết">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            static renderRecentNotes() {
+                const notesGrid = document.getElementById('notesGrid');
+                
+                if (this.recentNotes.length === 0) {
+                    notesGrid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-sticky-note"></i>
+                            <h3>Chưa có ghi chú nào</h3>
+                            <p>Bạn chưa tạo ghi chú nào. Hãy bắt đầu ghi chú khi học bài!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                notesGrid.innerHTML = this.recentNotes.map(note => `
+                    <div class="note-item ${note.color} slide-up">
+                        <div class="note-header">
+                            <div class="note-course">${this.escapeHtml(note.courseId?.name || 'Khóa học')}</div>
+                            <div class="note-date">${new Date(note.createdAt).toLocaleDateString('vi-VN')}</div>
+                        </div>
+                        <div class="note-content">${this.escapeHtml(note.content)}</div>
+                        ${note.tags && note.tags.length > 0 ? `
+                            <div class="note-tags">
+                                ${note.tags.slice(0, 3).map(tag => 
+                                    `<span class="note-tag">${this.escapeHtml(tag)}</span>`
+                                ).join('')}
+                                ${note.tags.length > 3 ? '<span class="note-tag">...</span>' : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+
+            static filterCoursesByStatus(courses) {
+                switch (this.currentFilter) {
+                    case 'in-progress':
+                        return courses.filter(course => 
+                            course.completionPercentage > 0 && course.completionPercentage < 100
+                        );
+                    case 'completed':
+                        return courses.filter(course => course.completionPercentage === 100);
+                    default:
+                        return courses;
+                }
+            }
+
+            static filterCourses(filter) {
+                this.currentFilter = filter;
+                
+                // Cập nhật active tab
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // Re-render courses
+                this.renderCourseStats();
+            }
+
+            static continueLearning(courseId) {
+                window.location.href = `/course-learning.html?courseId=${courseId}`;
+            }
+
+            static viewCourseDetails(courseId) {
+                // Mở modal hoặc trang chi tiết khóa học
+                window.location.href = `/course-detail.html?id=${courseId}`;
+            }
+
+            static showError(message) {
+                const overviewGrid = document.getElementById('overviewGrid');
+                overviewGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Lỗi</h3>
+                        <p>${message}</p>
+                        <button class="btn-continue" onclick="location.reload()" style="margin-top: 1rem;">
+                            <i class="fas fa-refresh"></i>
+                            Thử lại
+                        </button>
+                    </div>
+                `;
+            }
+
+            static escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text || '';
+                return div.innerHTML;
+            }
+        }
+
+        // Khởi tạo khi trang được tải
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Learning Stats Page Initialized');
+            LearningStatsManager.init();
+        });
+    </script>
+</body>
+</html>

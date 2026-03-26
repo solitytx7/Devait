@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Profile System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        .section h3 {
+            color: #555;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border: 3px solid #ddd;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .current-user {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .skill-item input {
+            margin: 0;
+            border: none;
+            background: transparent;
+        }
+
+        .remove-skill {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Profile System</h1>
+            <p>Kiểm tra tính năng cập nhật profile, avatar, bio, skills</p>
+        </div>
+
+        <div class="current-user" id="currentUser">
+            <h3>👤 Current User</h3>
+            <p id="userInfo">Đang tải thông tin user...</p>
+        </div>
+
+        <!-- 1. Login Test -->
+        <div class="section">
+            <h3>🔐 1. Login Test</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="loginEmail" value="admin@test.com" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="loginPassword" value="123456" placeholder="Password">
+            </div>
+            <button class="btn" onclick="testLogin()">Login</button>
+            <div class="result" id="loginResult"></div>
+        </div>
+
+        <!-- 2. Get Current Profile -->
+        <div class="section">
+            <h3>👤 2. Get Current Profile</h3>
+            <button class="btn" onclick="getCurrentProfile()">Get Profile</button>
+            <div class="result" id="profileResult"></div>
+        </div>
+
+        <!-- 3. Update Avatar -->
+        <div class="section">
+            <h3>🖼️ 3. Update Avatar</h3>
+            <div class="form-group">
+                <label>Choose Avatar:</label>
+                <input type="file" id="avatarFile" accept="image/*" onchange="previewAvatar()">
+            </div>
+            <img id="avatarPreview" class="avatar-preview" src="https://via.placeholder.com/150" alt="Avatar Preview">
+            <button class="btn" onclick="updateAvatar()">Update Avatar</button>
+            <div class="result" id="avatarResult"></div>
+        </div>
+
+        <!-- 4. Update Profile Info -->
+        <div class="section">
+            <h3>📝 4. Update Profile Info</h3>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="profileName" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+                <label>Bio:</label>
+                <textarea id="profileBio" placeholder="Tell us about yourself..." maxlength="500"></textarea>
+                <small>Characters: <span id="bioCharCount">0</span>/500</small>
+            </div>
+            <div class="form-group">
+                <label>Website:</label>
+                <input type="url" id="profileWebsite" placeholder="https://your-website.com">
+            </div>
+            <div class="form-group">
+                <label>LinkedIn:</label>
+                <input type="url" id="profileLinkedin" placeholder="https://linkedin.com/in/username">
+            </div>
+            <div class="form-group">
+                <label>GitHub:</label>
+                <input type="url" id="profileGithub" placeholder="https://github.com/username">
+            </div>
+            <button class="btn" onclick="updateProfile()">Update Profile</button>
+            <div class="result" id="updateResult"></div>
+        </div>
+
+        <!-- 5. Update Skills -->
+        <div class="section">
+            <h3>🎯 5. Update Skills</h3>
+            <div id="skillsList">
+                <!-- Skills will be added here -->
+            </div>
+            <div class="form-group">
+                <label>Add New Skill:</label>
+                <input type="text" id="newSkillName" placeholder="Skill name (e.g., JavaScript, React)">
+                <select id="newSkillLevel">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
+                </select>
+                <input type="number" id="newSkillExperience" placeholder="Years of experience" min="0" max="50">
+            </div>
+            <button class="btn" onclick="addSkill()">Add Skill</button>
+            <button class="btn" onclick="updateSkills()">Update All Skills</button>
+            <div class="result" id="skillsResult"></div>
+        </div>
+
+        <!-- 6. Complete Profile Update -->
+        <div class="section">
+            <h3>🔄 6. Complete Profile Update</h3>
+            <p>Update everything at once (avatar + profile info + skills)</p>
+            <button class="btn" onclick="updateCompleteProfile()">Update Complete Profile</button>
+            <div class="result" id="completeResult"></div>
+        </div>
+
+        <!-- 7. Google OAuth Tests -->
+        <div class="section">
+            <h3>🔗 7. Google OAuth Tests</h3>
+            <p>Test Google OAuth integration (Link/Unlink Google account)</p>
+            
+            <div class="input-group">
+                <button onclick="redirectToGoogleOAuth()" class="btn">Test Google OAuth Login</button>
+                <button onclick="testLinkGoogle()" class="btn">Link Demo Google Account</button>
+                <button onclick="testUnlinkGoogle()" class="btn">Unlink Google Account</button>
+            </div>
+            
+            <div class="result" id="googleResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = localStorage.getItem('token');
+        let currentUser = null;
+        let currentSkills = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            if (currentToken) {
+                getCurrentProfile();
+            }
+            
+            // Bio character counter
+            document.getElementById('profileBio').addEventListener('input', function() {
+                const count = this.value.length;
+                document.getElementById('bioCharCount').textContent = count;
+            });
+        });
+
+        // Show result
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.innerHTML = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update current user display
+        function updateCurrentUserDisplay() {
+            const userInfo = document.getElementById('userInfo');
+            if (currentUser) {
+                userInfo.innerHTML = `
+                    <strong>Name:</strong> ${currentUser.name || 'N/A'}<br>
+                    <strong>Email:</strong> ${currentUser.email}<br>
+                    <strong>Role:</strong> ${currentUser.role}<br>
+                    <strong>Bio:</strong> ${currentUser.bio || 'No bio'}<br>
+                    <strong>Skills:</strong> ${currentUser.skills ? currentUser.skills.length : 0} skills
+                `;
+            } else {
+                userInfo.innerHTML = 'Not logged in';
+            }
+        }
+
+        // 1. Test Login
+        async function testLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentToken = data.data.token;
+                    localStorage.setItem('token', currentToken);
+                    showResult('loginResult', `✅ Login successful! Token: ${currentToken.substring(0, 20)}...`);
+                    getCurrentProfile();
+                } else {
+                    showResult('loginResult', `❌ Login failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('loginResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // 2. Get Current Profile
+        async function getCurrentProfile() {
+            if (!currentToken) {
+                showResult('profileResult', '❌ Please login first', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data;
+                    currentSkills = currentUser.skills || [];
+                    
+                    // Fill form with current data
+                    document.getElementById('profileName').value = currentUser.name || '';
+                    document.getElementById('profileBio').value = currentUser.bio || '';
+                    document.getElementById('profileWebsite').value = currentUser.socialLinks?.website || '';
+                    document.getElementById('profileLinkedin').value = currentUser.socialLinks?.linkedin || '';
+                    document.getElementById('profileGithub').value = currentUser.socialLinks?.github || '';
+                    
+                    // Update bio character count
+                    document.getElementById('bioCharCount').textContent = (currentUser.bio || '').length;
+                    
+                    // Update avatar preview
+                    if (currentUser.avatar) {
+                        document.getElementById('avatarPreview').src = currentUser.avatar;
+                    }
+                    
+                    // Update skills display
+                    displaySkills();
+                    
+                    updateCurrentUserDisplay();
+                    showResult('profileResult', `✅ Profile loaded: ${currentUser.name} (${currentUser.email})`);
+                } else {
+                    showResult('profileResult', `❌ Failed to get profile: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('profileResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // 3. Preview Avatar
+        function previewAvatar() {
+            const file = document.getElementById('avatarFile').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 4. Update Avatar
+        async function updateAvatar() {
+            if (!currentToken) {
+                showResult('avatarResult', '❌ Please login first', false);
+                return;
+            }
+
+            const fileInput = document.getElementById('avatarFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showResult('avatarResult', '❌ Please select an avatar file', false);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data.user;
+                    updateCurrentUserDisplay();
+                    showResult('avatarResult', `✅ Avatar updated successfully!`);
+                } else {
+                    showResult('avatarResult', `❌ Avatar update failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('avatarResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // 5. Update Profile Info
+        async function updateProfile() {
+            if (!currentToken) {
+                showResult('updateResult', '❌ Please login first', false);
+                return;
+            }
+
+            const profileData = {
+                name: document.getElementById('profileName').value,
+                bio: document.getElementById('profileBio').value,
+                socialLinks: {
+                    website: document.getElementById('profileWebsite').value,
+                    linkedin: document.getElementById('profileLinkedin').value,
+                    github: document.getElementById('profileGithub').value
+                }
+            };
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`,
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data.user;
+                    updateCurrentUserDisplay();
+                    showResult('updateResult', `✅ Profile updated successfully!`);
+                } else {
+                    showResult('updateResult', `❌ Profile update failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('updateResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // 6. Skills Management
+        function displaySkills() {
+            const skillsList = document.getElementById('skillsList');
+            skillsList.innerHTML = '';
+
+            currentSkills.forEach((skill, index) => {
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-item';
+                skillDiv.innerHTML = `
+                    <input type="text" value="${skill.name}" onchange="updateSkillName(${index}, this.value)" placeholder="Skill name">
+                    <select onchange="updateSkillLevel(${index}, this.value)">
+                        <option value="beginner" ${skill.level === 'beginner' ? 'selected' : ''}>Beginner</option>
+                        <option value="intermediate" ${skill.level === 'intermediate' ? 'selected' : ''}>Intermediate</option>
+                        <option value="advanced" ${skill.level === 'advanced' ? 'selected' : ''}>Advanced</option>
+                        <option value="expert" ${skill.level === 'expert' ? 'selected' : ''}>Expert</option>
+                    </select>
+                    <input type="number" value="${skill.yearsOfExperience}" onchange="updateSkillExperience(${index}, this.value)" min="0" max="50" placeholder="Years">
+                    <button class="remove-skill" onclick="removeSkill(${index})">Remove</button>
+                `;
+                skillsList.appendChild(skillDiv);
+            });
+        }
+
+        function addSkill() {
+            const name = document.getElementById('newSkillName').value.trim();
+            const level = document.getElementById('newSkillLevel').value;
+            const experience = parseInt(document.getElementById('newSkillExperience').value) || 0;
+
+            if (!name) {
+                alert('Please enter skill name');
+                return;
+            }
+
+            currentSkills.push({ name, level, yearsOfExperience: experience });
+            displaySkills();
+
+            // Clear form
+            document.getElementById('newSkillName').value = '';
+            document.getElementById('newSkillLevel').value = 'beginner';
+            document.getElementById('newSkillExperience').value = '';
+        }
+
+        function removeSkill(index) {
+            currentSkills.splice(index, 1);
+            displaySkills();
+        }
+
+        function updateSkillName(index, name) {
+            currentSkills[index].name = name;
+        }
+
+        function updateSkillLevel(index, level) {
+            currentSkills[index].level = level;
+        }
+
+        function updateSkillExperience(index, experience) {
+            currentSkills[index].yearsOfExperience = parseInt(experience) || 0;
+        }
+
+        async function updateSkills() {
+            if (!currentToken) {
+                showResult('skillsResult', '❌ Please login first', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`,
+                    },
+                    body: JSON.stringify({ skills: currentSkills })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data.user;
+                    updateCurrentUserDisplay();
+                    showResult('skillsResult', `✅ Skills updated successfully! Total: ${currentSkills.length} skills`);
+                } else {
+                    showResult('skillsResult', `❌ Skills update failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('skillsResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // 7. Complete Profile Update
+        async function updateCompleteProfile() {
+            if (!currentToken) {
+                showResult('completeResult', '❌ Please login first', false);
+                return;
+            }
+
+            const fileInput = document.getElementById('avatarFile');
+            const file = fileInput.files[0];
+
+            const formData = new FormData();
+            
+            // Add profile data
+            formData.append('name', document.getElementById('profileName').value);
+            formData.append('bio', document.getElementById('profileBio').value);
+            formData.append('skills', JSON.stringify(currentSkills));
+            formData.append('socialLinks', JSON.stringify({
+                website: document.getElementById('profileWebsite').value,
+                linkedin: document.getElementById('profileLinkedin').value,
+                github: document.getElementById('profileGithub').value
+            }));
+
+            // Add avatar if selected
+            if (file) {
+                formData.append('avatar', file);
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data.user;
+                    updateCurrentUserDisplay();
+                    showResult('completeResult', `✅ Complete profile updated successfully!`);
+                } else {
+                    showResult('completeResult', `❌ Complete profile update failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('completeResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // Test Google OAuth linking
+        async function testLinkGoogle() {
+            if (!currentToken) {
+                showResult('googleResult', '❌ Please login first', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/link-google', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        googleId: 'demo-google-id-123',
+                        googleEmail: 'demo@gmail.com'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult('googleResult', `✅ Google account linked successfully!`);
+                } else {
+                    showResult('googleResult', `❌ Link Google failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('googleResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // Test Google OAuth unlinking
+        async function testUnlinkGoogle() {
+            if (!currentToken) {
+                showResult('googleResult', '❌ Please login first', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/unlink-google', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult('googleResult', `✅ Google account unlinked successfully!`);
+                } else {
+                    showResult('googleResult', `❌ Unlink Google failed: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult('googleResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        // Redirect to Google OAuth
+        function redirectToGoogleOAuth() {
+            window.open('/api/auth/google', '_blank');
+            showResult('googleResult', '🔄 Opening Google OAuth in new tab...', true);
+        }
+    </script>
+</body>
+</html>

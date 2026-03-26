@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Quick Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        button { padding: 15px 30px; font-size: 16px; margin: 10px; border: none; border-radius: 5px; cursor: pointer; }
+        .login { background: #28a745; color: white; }
+        .admin { background: #007bff; color: white; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Admin Quick Login</h1>
+    
+    <button class="login" onclick="quickLogin()">
+        🔐 Quick Login as Admin
+    </button>
+    
+    <button class="admin" onclick="openAdmin()">
+        👨‍💼 Open Admin Dashboard
+    </button>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        async function quickLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.setItem('token', result.data.token);
+                    localStorage.setItem('user', JSON.stringify(result.data.user));
+                    
+                    document.getElementById('result').className = 'result success';
+                    document.getElementById('result').innerHTML = `
+                        ✅ Login successful!<br>
+                        👤 User: ${result.data.user.name}<br>
+                        🔑 Role: ${result.data.user.role}<br>
+                        🎯 Ready for admin dashboard!
+                    `;
+                } else {
+                    document.getElementById('result').className = 'result error';
+                    document.getElementById('result').textContent = '❌ Login failed: ' + result.message;
+                }
+            } catch (error) {
+                document.getElementById('result').className = 'result error';
+                document.getElementById('result').textContent = '❌ Error: ' + error.message;
+            }
+        }
+
+        function openAdmin() {
+            window.open('/admin.html#lessons', '_blank');
+        }
+
+        // Check current status
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (token && user.role) {
+                document.getElementById('result').className = 'result success';
+                document.getElementById('result').innerHTML = `
+                    ✅ Already logged in!<br>
+                    👤 User: ${user.name || user.email}<br>
+                    🔑 Role: ${user.role}<br>
+                    🎯 Click "Open Admin Dashboard" to proceed
+                `;
+            }
+        };
+    </script>
+</body>
+</html>

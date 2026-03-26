@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài Đặt Câu Hỏi Bảo Mật - Learning System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .question-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .question-section h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .info-box p {
+            margin: 0;
+            color: #1976d2;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Quay lại trang chủ</a>
+        
+        <div class="header">
+            <h1>Cài Đặt Câu Hỏi Bảo Mật</h1>
+            <p>Thiết lập câu hỏi bảo mật để có thể khôi phục mật khẩu khi cần thiết</p>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Lưu ý:</strong> Câu hỏi bảo mật giúp bạn khôi phục tài khoản khi quên mật khẩu. Hãy chọn câu hỏi và trả lời mà chỉ bạn biết.</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+        <div id="loading" class="loading">Đang tải...</div>
+
+        <form id="securityForm">
+            <div class="question-section">
+                <h3>Câu hỏi bảo mật thứ nhất</h3>
+                <div class="form-group">
+                    <label for="question1">Chọn câu hỏi:</label>
+                    <select id="question1" name="question1" required>
+                        <option value="">-- Chọn câu hỏi --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="answer1">Câu trả lời:</label>
+                    <input type="text" id="answer1" name="answer1" placeholder="Nhập câu trả lời của bạn" required>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <h3>Câu hỏi bảo mật thứ hai</h3>
+                <div class="form-group">
+                    <label for="question2">Chọn câu hỏi:</label>
+                    <select id="question2" name="question2" required>
+                        <option value="">-- Chọn câu hỏi --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="answer2">Câu trả lời:</label>
+                    <input type="text" id="answer2" name="answer2" placeholder="Nhập câu trả lời của bạn" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn">Lưu Câu Hỏi Bảo Mật</button>
+        </form>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'auth.html';
+        }
+
+        let availableQuestions = [];
+
+        // Load security questions
+        async function loadSecurityQuestions() {
+            try {
+                showLoading(true);
+                const response = await fetch('/api/auth/security-questions/list');
+                const data = await response.json();
+                
+                if (data.success) {
+                    availableQuestions = data.data.questions;
+                    populateQuestionSelects();
+                } else {
+                    showAlert('error', data.message || 'Không thể tải danh sách câu hỏi');
+                }
+            } catch (error) {
+                console.error('Load questions error:', error);
+                showAlert('error', 'Lỗi kết nối khi tải câu hỏi');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Populate question select elements
+        function populateQuestionSelects() {
+            const question1Select = document.getElementById('question1');
+            const question2Select = document.getElementById('question2');
+            
+            // Clear existing options except first
+            question1Select.innerHTML = '<option value="">-- Chọn câu hỏi --</option>';
+            question2Select.innerHTML = '<option value="">-- Chọn câu hỏi --</option>';
+            
+            // Add questions to both selects
+            availableQuestions.forEach(question => {
+                const option1 = document.createElement('option');
+                option1.value = question;
+                option1.textContent = question;
+                question1Select.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = question;
+                option2.textContent = question;
+                question2Select.appendChild(option2);
+            });
+        }
+
+        // Handle question selection to prevent duplicates
+        function setupQuestionHandlers() {
+            const question1Select = document.getElementById('question1');
+            const question2Select = document.getElementById('question2');
+            
+            question1Select.addEventListener('change', function() {
+                updateQuestionOptions(question2Select, this.value);
+            });
+            
+            question2Select.addEventListener('change', function() {
+                updateQuestionOptions(question1Select, this.value);
+            });
+        }
+
+        // Update question options to prevent duplicates
+        function updateQuestionOptions(selectElement, selectedValue) {
+            const options = selectElement.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === '') return; // Skip placeholder option
+                
+                if (option.value === selectedValue) {
+                    option.disabled = true;
+                    option.style.display = 'none';
+                } else {
+                    option.disabled = false;
+                    option.style.display = 'block';
+                }
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('securityForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                question1: formData.get('question1'),
+                answer1: formData.get('answer1').trim(),
+                question2: formData.get('question2'),
+                answer2: formData.get('answer2').trim()
+            };
+            
+            // Validation
+            if (!data.question1 || !data.answer1 || !data.question2 || !data.answer2) {
+                showAlert('error', 'Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+            
+            if (data.question1 === data.question2) {
+                showAlert('error', 'Hai câu hỏi phải khác nhau');
+                return;
+            }
+            
+            if (data.answer1.toLowerCase() === data.answer2.toLowerCase()) {
+                showAlert('error', 'Hai câu trả lời phải khác nhau');
+                return;
+            }
+            
+            if (data.answer1.length < 2 || data.answer2.length < 2) {
+                showAlert('error', 'Câu trả lời phải có ít nhất 2 ký tự');
+                return;
+            }
+            
+            try {
+                showLoading(true);
+                const response = await fetch('/api/auth/security-questions', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Cài đặt câu hỏi bảo mật thành công!');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showAlert('error', result.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                console.error('Setup security questions error:', error);
+                showAlert('error', 'Lỗi kết nối. Vui lòng thử lại');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Utility functions
+        function showAlert(type, message) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.className = `alert ${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const form = document.getElementById('securityForm');
+            
+            loading.style.display = show ? 'block' : 'none';
+            form.style.display = show ? 'none' : 'block';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSecurityQuestions();
+            setupQuestionHandlers();
+        });
+    </script>
+</body>
+</html>

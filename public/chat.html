@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat với Giảng viên | EduPlatform</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    
+    <style>
+        /* Chat Specific Styles */
+        .chat-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            height: calc(100vh - 200px);
+        }
+
+        /* Conversations Sidebar */
+        .conversations-sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conversations-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .conversations-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .conversations-search {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 0.925rem;
+        }
+
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+
+        .conversation-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .conversation-item:hover {
+            background: #f8f9fa;
+        }
+
+        .conversation-item.active {
+            background: rgba(52, 152, 219, 0.1);
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .conversation-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .conversation-name {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.925rem;
+        }
+
+        .conversation-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .conversation-preview {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-course {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .unread-badge {
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-area-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-partner-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-partner-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .chat-partner-details h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .chat-partner-details p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .online-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-color);
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .offline-status {
+            background: var(--text-muted);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-action-btn {
+            padding: 0.5rem;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .chat-action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Messages Area */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeInMessage 0.3s ease-out forwards;
+        }
+
+        .message.own {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .message.own .message-avatar {
+            background: var(--accent-color);
+        }
+
+        .message-content {
+            max-width: 70%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-bubble {
+            background: white;
+            padding: 0.875rem 1.125rem;
+            border-radius: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.own .message-bubble {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .message-text {
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+
+        .message.own .message-time {
+            text-align: left;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .message-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .message.own .message-status {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1.5rem;
+            background: rgba(0,0,0,0.05);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: typingDot 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        /* Message Input */
+        .message-input-container {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .message-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            resize: none;
+            font-family: inherit;
+            font-size: 0.925rem;
+            line-height: 1.4;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .message-input-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-action-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .send-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Empty States */
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .empty-chat i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+        }
+
+        .empty-conversations {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-conversations i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .loading i {
+            margin-right: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typingDot {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                padding: 1rem;
+            }
+
+            .chat-layout {
+                grid-template-columns: 1fr;
+                height: calc(100vh - 150px);
+            }
+
+            .conversations-sidebar {
+                display: none;
+            }
+
+            .conversations-sidebar.mobile-show {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                background: white;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .chat-header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="margin: 0; color: var(--text-color);">
+                        <i class="fas fa-comments"></i>
+                        Chat với Giảng viên
+                    </h2>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--text-muted);">
+                        Trao đổi trực tiếp với giảng viên về khóa học
+                    </p>
+                </div>
+                <div>
+                    <a href="/index.html" class="btn" style="text-decoration: none; margin-right: 1rem;">
+                        <i class="fas fa-home"></i>
+                        Trang chủ
+                    </a>
+                    <button class="btn btn-primary mobile-conversations-toggle" onclick="toggleMobileConversations()">
+                        <i class="fas fa-list"></i>
+                        Cuộc trò chuyện
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Layout -->
+        <div class="chat-layout">
+            <!-- Conversations Sidebar -->
+            <div class="conversations-sidebar" id="conversationsSidebar">
+                <div class="conversations-header">
+                    <h3>Cuộc trò chuyện</h3>
+                </div>
+                
+                <div class="conversations-search">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm cuộc trò chuyện..." 
+                           id="conversationSearch" onInput="ChatManager.searchConversations(this.value)">
+                </div>
+
+                <div class="conversations-list" id="conversationsList">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Đang tải cuộc trò chuyện...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-area" id="chatArea">
+                <div class="empty-chat" id="emptyChatState">
+                    <i class="fas fa-comments"></i>
+                    <h3>Chọn cuộc trò chuyện</h3>
+                    <p>Chọn một cuộc trò chuyện để bắt đầu nhắn tin với giảng viên</p>
+                </div>
+
+                <!-- Chat Header (Hidden initially) -->
+                <div class="chat-area-header" id="chatAreaHeader" style="display: none;">
+                    <div class="chat-partner-info">
+                        <div class="chat-partner-avatar" id="chatPartnerAvatar">GV</div>
+                        <div class="chat-partner-details">
+                            <h4 id="chatPartnerName">Giảng viên</h4>
+                            <p id="chatPartnerCourse">Khóa học</p>
+                        </div>
+                        <span class="online-status" id="chatPartnerStatus"></span>
+                    </div>
+                    
+                    <div class="chat-actions">
+                        <button class="chat-action-btn" onclick="ChatManager.searchInConversation()" title="Tìm kiếm">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="chat-action-btn" onclick="ChatManager.showConversationInfo()" title="Thông tin">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Messages Container (Hidden initially) -->
+                <div class="messages-container" id="messagesContainer" style="display: none;">
+                    <!-- Messages will be populated here -->
+                </div>
+
+                <!-- Typing Indicator (Hidden initially) -->
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <span id="typingUser">Giảng viên</span> đang soạn tin nhắn
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+
+                <!-- Message Input (Hidden initially) -->
+                <div class="message-input-container" id="messageInputContainer" style="display: none;">
+                    <div class="message-input-wrapper">
+                        <textarea 
+                            class="message-input" 
+                            id="messageInput" 
+                            placeholder="Nhập tin nhắn..."
+                            rows="1"
+                            onInput="ChatManager.handleInputChange(this)"
+                            onKeyDown="ChatManager.handleKeyDown(event)">
+                        </textarea>
+                        
+                        <div class="message-input-actions">
+                            <button class="input-action-btn" onclick="ChatManager.attachFile()" title="Đính kèm tập tin">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            
+                            <button class="input-action-btn send-btn" id="sendBtn" 
+                                    onclick="ChatManager.sendMessage()" title="Gửi tin nhắn" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script>
+        // Chat Manager Class
+        class ChatManager {
+            static socket = null;
+            static currentUser = null;
+            static currentConversation = null;
+            static conversations = [];
+            static messages = [];
+            static isConnected = false;
+            static typingTimer = null;
+            static onlineUsers = [];
+
+            static async init() {
+                try {
+                    // Check authentication
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        window.location.href = '/auth.html';
+                        return;
+                    }
+
+                    // Get current user
+                    const response = await APIService.getCurrentUser();
+                    if (response.success) {
+                        this.currentUser = response.data;
+                        this.initializeSocket();
+                        await this.loadConversations();
+                        
+                        // Check if conversation ID is provided in URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const conversationId = urlParams.get('conversation');
+                        if (conversationId) {
+                            // Wait a bit for conversations to load
+                            setTimeout(() => {
+                                this.selectConversation(conversationId);
+                            }, 1000);
+                        }
+                    } else {
+                        throw new Error('Authentication failed');
+                    }
+                } catch (error) {
+                    console.error('Chat initialization error:', error);
+                    window.location.href = '/auth.html';
+                }
+            }
+
+            static initializeSocket() {
+                this.socket = io();
+                
+                this.socket.on('connect', () => {
+                    console.log('✅ Connected to chat server');
+                    this.isConnected = true;
+                    this.socket.emit('join', {
+                        userId: this.currentUser._id,
+                        name: this.currentUser.name
+                    });
+                });
+
+                this.socket.on('disconnect', () => {
+                    console.log('❌ Disconnected from chat server');
+                    this.isConnected = false;
+                });
+
+                // Listen for new messages
+                this.socket.on('newMessage', (message) => {
+                    this.handleNewMessage(message);
+                });
+
+                // Listen for typing indicators
+                this.socket.on('userTyping', (data) => {
+                    this.handleTypingIndicator(data);
+                });
+
+                // Listen for online users
+                this.socket.on('onlineUsers', (users) => {
+                    this.onlineUsers = users;
+                    this.updateOnlineStatus();
+                });
+
+                // Listen for message reactions
+                this.socket.on('reactionUpdate', (data) => {
+                    this.handleReactionUpdate(data);
+                });
+            }
+
+            static async loadConversations() {
+                try {
+                    const response = await fetch('/api/chat/conversations', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        this.conversations = result.data.conversations;
+                        this.renderConversations();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error loading conversations:', error);
+                    this.showError('Không thể tải danh sách cuộc trò chuyện');
+                }
+            }
+
+            static renderConversations() {
+                const container = document.getElementById('conversationsList');
+                
+                if (this.conversations.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-conversations">
+                            <i class="fas fa-comments"></i>
+                            <h4>Chưa có cuộc trò chuyện</h4>
+                            <p>Truy cập trang khóa học và nhấn "Chat với giảng viên" để bắt đầu</p>
+                            <a href="/index.html" class="btn btn-primary" style="margin-top: 1rem; text-decoration: none;">
+                                <i class="fas fa-search"></i>
+                                Duyệt khóa học
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.conversations.map(conv => this.renderConversationItem(conv)).join('');
+            }
+
+            static renderConversationItem(conversation) {
+                const isOnline = this.onlineUsers.some(user => user.userId === conversation.partner._id);
+                
+                return `
+                    <div class="conversation-item" data-conversation-id="${conversation._id}" 
+                         onclick="ChatManager.selectConversation('${conversation._id}')">
+                        <div class="conversation-info">
+                            <div class="conversation-name">${this.escapeHtml(conversation.partner.name)}</div>
+                            <div class="conversation-time">${this.formatTime(conversation.lastActivity)}</div>
+                        </div>
+                        <div class="conversation-preview">
+                            ${conversation.lastMessage ? this.escapeHtml(conversation.lastMessage.content) : 'Chưa có tin nhắn'}
+                        </div>
+                        <div class="conversation-course">${this.escapeHtml(conversation.course.name)}</div>
+                        ${conversation.unreadCount > 0 ? `<div class="unread-badge">${conversation.unreadCount}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            static async selectConversation(conversationId) {
+                try {
+                    // Update active conversation UI
+                    document.querySelectorAll('.conversation-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    const selectedItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+                    if (selectedItem) {
+                        selectedItem.classList.add('active');
+                    }
+
+                    // Load conversation details
+                    const conversation = this.conversations.find(c => c._id === conversationId);
+                    if (!conversation) return;
+
+                    this.currentConversation = conversation;
+                    
+                    // Join socket room
+                    if (this.socket) {
+                        this.socket.emit('joinConversation', conversationId);
+                    }
+
+                    // Update chat area header
+                    this.updateChatHeader(conversation);
+                    
+                    // Load messages
+                    await this.loadMessages(conversationId);
+                    
+                    // Mark as read
+                    await this.markAsRead(conversationId);
+                    
+                    // Show chat interface
+                    document.getElementById('emptyChatState').style.display = 'none';
+                    document.getElementById('chatAreaHeader').style.display = 'flex';
+                    document.getElementById('messagesContainer').style.display = 'flex';
+                    document.getElementById('messageInputContainer').style.display = 'block';
+
+                    // Hide mobile sidebar
+                    if (window.innerWidth <= 768) {
+                        this.hideMobileConversations();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error selecting conversation:', error);
+                    this.showError('Không thể mở cuộc trò chuyện');
+                }
+            }
+
+            static updateChatHeader(conversation) {
+                const avatar = document.getElementById('chatPartnerAvatar');
+                const name = document.getElementById('chatPartnerName');
+                const course = document.getElementById('chatPartnerCourse');
+                const status = document.getElementById('chatPartnerStatus');
+
+                avatar.textContent = this.getInitials(conversation.partner.name);
+                name.textContent = conversation.partner.name;
+                course.textContent = conversation.course.name;
+                
+                const isOnline = this.onlineUsers.some(user => user.userId === conversation.partner._id);
+                status.className = isOnline ? 'online-status' : 'online-status offline-status';
+            }
+
+            static async loadMessages(conversationId) {
+                try {
+                    const response = await fetch(`/api/chat/conversations/${conversationId}/messages`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        this.messages = result.data.messages;
+                        this.renderMessages();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error loading messages:', error);
+                    this.showError('Không thể tải tin nhắn');
+                }
+            }
+
+            static renderMessages() {
+                const container = document.getElementById('messagesContainer');
+                container.innerHTML = this.messages.map(message => this.renderMessage(message)).join('');
+                
+                // Scroll to bottom
+                container.scrollTop = container.scrollHeight;
+            }
+
+            static renderMessage(message) {
+                const isOwn = message.sender._id === this.currentUser._id;
+                
+                return `
+                    <div class="message ${isOwn ? 'own' : ''}" data-message-id="${message._id}">
+                        <div class="message-avatar">
+                            ${this.getInitials(message.sender.name)}
+                        </div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <p class="message-text">${this.escapeHtml(message.content)}</p>
+                            </div>
+                            <div class="message-time">${this.formatTime(message.createdAt)}</div>
+                            ${isOwn ? '<div class="message-status">Đã gửi</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            static async sendMessage() {
+                const input = document.getElementById('messageInput');
+                const content = input.value.trim();
+                
+                if (!content || !this.currentConversation) return;
+
+                try {
+                    const response = await fetch(`/api/chat/conversations/${this.currentConversation._id}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ content })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        input.value = '';
+                        this.updateSendButton();
+                        this.stopTyping();
+                        
+                        // Add message to UI immediately
+                        this.messages.push(result.data);
+                        this.addMessageToUI(result.data);
+                        
+                        // Update conversation list
+                        await this.loadConversations();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    this.showError('Không thể gửi tin nhắn');
+                }
+            }
+
+            static addMessageToUI(message) {
+                const container = document.getElementById('messagesContainer');
+                const messageElement = document.createElement('div');
+                messageElement.innerHTML = this.renderMessage(message);
+                container.appendChild(messageElement.firstElementChild);
+                
+                // Scroll to bottom
+                container.scrollTop = container.scrollHeight;
+            }
+
+            static handleInputChange(input) {
+                // Auto-resize textarea
+                input.style.height = 'auto';
+                input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+                
+                // Update send button
+                this.updateSendButton();
+                
+                // Handle typing indicator
+                this.handleTyping();
+            }
+
+            static updateSendButton() {
+                const input = document.getElementById('messageInput');
+                const sendBtn = document.getElementById('sendBtn');
+                sendBtn.disabled = !input.value.trim();
+            }
+
+            static handleTyping() {
+                if (!this.currentConversation || !this.socket) return;
+
+                // Clear previous timer
+                if (this.typingTimer) {
+                    clearTimeout(this.typingTimer);
+                }
+
+                // Emit typing start
+                this.socket.emit('typing', {
+                    conversationId: this.currentConversation._id,
+                    isTyping: true
+                });
+
+                // Set timer to stop typing
+                this.typingTimer = setTimeout(() => {
+                    this.stopTyping();
+                }, 3000);
+            }
+
+            static stopTyping() {
+                if (!this.currentConversation || !this.socket) return;
+
+                this.socket.emit('typing', {
+                    conversationId: this.currentConversation._id,
+                    isTyping: false
+                });
+            }
+
+            static handleKeyDown(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    this.sendMessage();
+                }
+            }
+
+            static handleNewMessage(message) {
+                if (this.currentConversation && message.conversation === this.currentConversation._id) {
+                    this.messages.push(message);
+                    this.addMessageToUI(message);
+                    
+                    // Mark as read if conversation is active
+                    this.markAsRead(this.currentConversation._id);
+                }
+                
+                // Update conversations list
+                this.loadConversations();
+            }
+
+            static handleTypingIndicator(data) {
+                if (!this.currentConversation || data.conversationId !== this.currentConversation._id) return;
+
+                const indicator = document.getElementById('typingIndicator');
+                const userSpan = document.getElementById('typingUser');
+
+                if (data.isTyping) {
+                    userSpan.textContent = data.userName;
+                    indicator.style.display = 'flex';
+                } else {
+                    indicator.style.display = 'none';
+                }
+            }
+
+            static async markAsRead(conversationId) {
+                try {
+                    await fetch(`/api/chat/conversations/${conversationId}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error marking as read:', error);
+                }
+            }
+
+            static updateOnlineStatus() {
+                // Update conversation list online indicators
+                this.renderConversations();
+                
+                // Update chat header if conversation is open
+                if (this.currentConversation) {
+                    this.updateChatHeader(this.currentConversation);
+                }
+            }
+
+            // Utility functions
+            static getInitials(name) {
+                return name.split(' ')
+                    .map(word => word.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+            }
+
+            static escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            static formatTime(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return 'Vừa xong';
+                if (diff < 3600000) return `${Math.floor(diff / 60000)} phút trước`;
+                if (diff < 86400000) return `${Math.floor(diff / 3600000)} giờ trước`;
+                
+                return date.toLocaleDateString('vi-VN');
+            }
+
+            static showError(message) {
+                // You can implement a toast notification here
+                alert(message);
+            }
+
+            // Mobile functions
+            static toggleMobileConversations() {
+                const sidebar = document.getElementById('conversationsSidebar');
+                sidebar.classList.toggle('mobile-show');
+            }
+
+            static hideMobileConversations() {
+                const sidebar = document.getElementById('conversationsSidebar');
+                sidebar.classList.remove('mobile-show');
+            }
+
+            // Additional features
+            static searchConversations(query) {
+                // Filter conversations based on search query
+                const filtered = this.conversations.filter(conv => 
+                    conv.partner.name.toLowerCase().includes(query.toLowerCase()) ||
+                    conv.course.name.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                // Re-render with filtered results
+                const container = document.getElementById('conversationsList');
+                container.innerHTML = filtered.map(conv => this.renderConversationItem(conv)).join('');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('💬 Chat page initialized');
+            ChatManager.init();
+        });
+
+        // Mobile conversation toggle
+        function toggleMobileConversations() {
+            ChatManager.toggleMobileConversations();
+        }
+    </script>
+</body>
+</html>

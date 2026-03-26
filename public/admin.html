@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quản lý khóa học | EduPlatform</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <script src="js/auth.js"></script>
+    
+    <style>
+        /* Admin specific styles */
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-large);
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .admin-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.125rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-nav-item {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav-item:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .admin-nav-item.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .admin-content {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+        }
+
+        .admin-section {
+            display: none;
+            padding: 2rem;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Course Form Styles */
+        .course-form {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            flex-direction: column;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload-label i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .file-preview-item {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-small);
+        }
+
+        .file-preview-item img {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        .file-preview-item video {
+            width: 200px;
+            height: 120px;
+        }
+
+        .file-preview-remove {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--error-color);
+            font-size: 0.875rem;
+        }
+
+        /* Course List Styles */
+        .courses-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .courses-table th,
+        .courses-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .courses-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .courses-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .course-image-small {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .course-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .course-status.published {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+        }
+
+        .course-status.draft {
+            background: rgba(251, 191, 36, 0.1);
+            color: #d97706;
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 4px;
+        }
+
+        .btn-edit {
+            background: var(--warning-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-delete {
+            background: var(--error-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-view {
+            background: var(--info-color);
+            color: white;
+            border: none;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            text-align: center;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .stat-card.secondary {
+            border-top-color: var(--secondary-color);
+        }
+
+        .stat-card.success {
+            border-top-color: var(--success-color);
+        }
+
+        .stat-card.warning {
+            border-top-color: var(--warning-color);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-large);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-secondary);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 2px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: var(--bg-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 1rem;
+            }
+
+            .admin-header {
+                padding: 1.5rem;
+            }
+
+            .admin-header h1 {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .courses-table {
+                font-size: 0.875rem;
+            }
+
+            .courses-table th,
+            .courses-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading and Alert States */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            display: none;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            font-size: 3rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert.warning {
+            background: rgba(251, 191, 36, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        /* User Management Styles */
+        .users-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .users-table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-small);
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .users-table th {
+            background: var(--background-light);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .users-table tr:hover {
+            background: var(--background-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-email {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-admin {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .role-teacher {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+        }
+
+        .role-user {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            min-width: auto;
+        }
+
+        .section-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            min-height: 50px;
+            cursor: text;
+        }
+
+        .tag-item {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .tag-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 150px;
+            padding: 0.25rem;
+            font-size: 1rem;
+        }
+
+        /* Progress Bar Styles */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        #videoFileFeedback {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1><i class="fas fa-graduation-cap"></i> Admin Dashboard</h1>
+                    <p>Quản lý khóa học và nội dung giáo dục</p>
+                </div>
+                <div>
+                    <button onclick="openDebugTool()" style="background: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                        🔧 Debug Tool
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Navigation -->
+        <div class="admin-nav">
+            <a href="#dashboard" class="admin-nav-item active" data-section="dashboard">
+                <i class="fas fa-chart-dashboard"></i>
+                Dashboard
+            </a>
+            <a href="#courses" class="admin-nav-item" data-section="courses">
+                <i class="fas fa-book"></i>
+                Khóa học
+            </a>
+            <a href="#add-course" class="admin-nav-item" data-section="add-course">
+                <i class="fas fa-plus"></i>
+                Thêm khóa học
+            </a>
+            <a href="#lessons" class="admin-nav-item" data-section="lessons">
+                <i class="fas fa-play-circle"></i>
+                Quản lý bài học
+            </a>
+            <a href="#add-lesson" class="admin-nav-item" data-section="add-lesson">
+                <i class="fas fa-plus-circle"></i>
+                Thêm bài học
+            </a>
+            <a href="#messenger" class="admin-nav-item" data-section="messenger">
+                <i class="fas fa-comments"></i>
+                Messenger
+            </a>
+            <a href="#users" class="admin-nav-item admin-only" data-section="users" style="display: none;">
+                <i class="fas fa-users"></i>
+                Quản lý người dùng
+            </a>
+            <a href="#settings" class="admin-nav-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                Cài đặt
+            </a>
+            <a href="/" class="admin-nav-item">
+                <i class="fas fa-external-link-alt"></i>
+                Xem trang chủ
+            </a>
+            <a href="#" class="admin-nav-item" onclick="authManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Đăng xuất
+            </a>
+        </div>
+
+        <!-- Admin Content -->
+        <div class="admin-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="admin-section active">
+                <div class="section-header">
+                    <h2 class="section-title">Dashboard</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-number" id="totalCoursesAdmin">0</div>
+                        <div class="stat-label">Tổng khóa học</div>
+                    </div>
+                    <div class="stat-card secondary">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number" id="totalStudentsAdmin">0</div>
+                        <div class="stat-label">Tổng học viên</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number" id="publishedCourses">0</div>
+                        <div class="stat-label">Đã xuất bản</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number" id="draftCourses">0</div>
+                        <div class="stat-label">Bản nháp</div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h3>Khóa học gần đây</h3>
+                </div>
+
+                <div id="recentCourses">
+                    <!-- Recent courses will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Courses Management Section -->
+            <div id="courses" class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">Quản lý khóa học</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="openAddCourseModal()">
+                            <i class="fas fa-plus"></i> Thêm khóa học mới
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshCoursesList()">
+                            <i class="fas fa-sync-alt"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <div class="alert" id="coursesAlert"></div>
+
+                <table class="courses-table">
+                    <thead>
+                        <tr>
+                            <th>Hình ảnh</th>
+                            <th>Tên khóa học</th>
+                            <th>Danh mục</th>
+                            <th>Giá</th>
+                            <th>Học viên</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coursesTableBody">
+                        <!-- Courses will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Lessons Management Section -->
+            <div id="lessons" class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">Quản lý bài học</h2>
+                    <div class="section-actions">
+                        <select id="courseFilterLessons" class="form-control" style="margin-right: 1rem;">
+                            <option value="">Tất cả khóa học</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="openAddLessonModal()">
+                            <i class="fas fa-plus"></i> Thêm bài học mới
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshLessonsList()">
+                            <i class="fas fa-sync-alt"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <div class="alert" id="lessonsAlert"></div>
+
+                <table class="courses-table">
+                    <thead>
+                        <tr>
+                            <th>Thứ tự</th>
+                            <th>Tiêu đề</th>
+                            <th>Khóa học</th>
+                            <th>Thời lượng</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lessonsTableBody">
+                        <!-- Lessons will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Lesson Section -->
+            <div id="add-lesson" class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">🎓 Thêm bài học mới</h2>
+                    <p style="color: #666; margin: 10px 0;">Tạo bài học mới cho khóa học của bạn</p>
+                </div>
+
+                <!-- Debug Info -->
+                <div id="formDebugInfo" style="background: #e3f2fd; padding: 10px; margin: 10px 0; border-radius: 5px; display: none;">
+                    <strong>🔧 Debug Info:</strong>
+                    <div id="debugContent"></div>
+                </div>
+
+                <!-- Alert Messages -->
+                <div class="alert" id="addLessonAlert"></div>
+
+                <!-- New Simple Form -->
+                <!-- Simple New Lesson Form -->
+                <form id="newLessonForm" class="course-form" style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    
+                    <!-- Course Selection -->
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="courseSelect" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                            <i class="fas fa-book"></i> Chọn khóa học *
+                        </label>
+                        <select id="courseSelect" name="course" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                            <option value="">-- Chọn khóa học --</option>
+                        </select>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button type="button" onclick="loadCoursesForNewForm()" style="padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 12px;">
+                                🔄 Tải danh sách khóa học
+                            </button>
+                            <button type="button" onclick="debugCourseAPI()" style="padding: 6px 12px; background: #17a2b8; color: white; border: none; border-radius: 5px; font-size: 12px;">
+                                🔧 Debug API
+                            </button>
+                            <button type="button" onclick="checkFormElements()" style="padding: 6px 12px; background: #6f42c1; color: white; border: none; border-radius: 5px; font-size: 12px;">
+                                🔍 Check Elements
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Basic Info Row -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label for="lessonTitle" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                                <i class="fas fa-heading"></i> Tiêu đề bài học *
+                            </label>
+                            <input type="text" id="lessonTitle" name="title" required 
+                                   style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;"
+                                   placeholder="Nhập tiêu đề bài học...">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lessonOrder" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                                <i class="fas fa-sort-numeric-up"></i> Thứ tự *
+                            </label>
+                            <input type="number" id="lessonOrder" name="order" min="1" required 
+                                   style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;"
+                                   placeholder="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lessonDuration" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                                <i class="fas fa-clock"></i> Thời lượng (phút)
+                            </label>
+                            <input type="number" id="lessonDuration" name="duration" min="1" value="30" 
+                                   style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="lessonDescription" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                            <i class="fas fa-align-left"></i> Mô tả bài học
+                        </label>
+                        <textarea id="lessonDescription" name="description" rows="3" 
+                                  style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; resize: vertical;"
+                                  placeholder="Mô tả ngắn gọn về nội dung bài học..."></textarea>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="lessonContent" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                            <i class="fas fa-file-alt"></i> Nội dung chi tiết
+                        </label>
+                        <textarea id="lessonContent" name="content" rows="6" 
+                                  style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; resize: vertical;"
+                                  placeholder="Nội dung chi tiết của bài học..."></textarea>
+                    </div>
+
+                    <!-- Video Options -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; color: #333;"><i class="fas fa-video"></i> Video bài học</h4>
+                        
+                        <!-- Video URL -->
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="videoUrl" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                                🔗 URL Video (YouTube, Vimeo, etc.)
+                            </label>
+                            <input type="url" id="videoUrl" name="videoUrl" 
+                                   style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;"
+                                   placeholder="https://youtube.com/watch?v=...">
+                            <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                                Paste link từ YouTube, Vimeo hoặc platform video khác
+                            </small>
+                        </div>
+
+                        <!-- OR Divider -->
+                        <div style="text-align: center; margin: 15px 0; color: #666; font-weight: bold;">
+                            ─────── HOẶC ───────
+                        </div>
+
+                        <!-- Video Upload -->
+                        <div class="form-group">
+                            <label for="videoFile" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                                📁 Upload Video File
+                            </label>
+                            <input type="file" id="videoFile" name="video" 
+                                   accept="video/mp4,video/avi,video/mov,video/wmv,video/webm" 
+                                   onchange="handleVideoFileSelect(event)"
+                                   style="width: 100%; padding: 10px; border: 2px dashed #007bff; border-radius: 8px; font-size: 16px; background: white;">
+                            <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                                📹 Hỗ trợ: MP4, AVI, MOV, WMV, WebM (Tối đa 100MB)
+                            </small>
+                            
+                            <!-- Video Preview & Progress -->
+                            <div id="videoPreview" style="display: none; margin-top: 10px; padding: 10px; background: white; border-radius: 5px; border: 1px solid #ddd;">
+                                <div id="videoInfo" style="font-size: 14px; color: #333;"></div>
+                            </div>
+                            
+                            <div id="uploadProgress" style="display: none; margin-top: 10px;">
+                                <div style="background: #e9ecef; border-radius: 10px; height: 20px; overflow: hidden;">
+                                    <div id="progressBar" style="background: linear-gradient(90deg, #007bff, #28a745); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                                </div>
+                                <small id="progressText" style="display: block; margin-top: 5px; color: #666;">Đang upload...</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div style="display: flex; gap: 15px; justify-content: flex-start; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+                        <button type="submit" style="background: #007bff; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-plus"></i> Tạo bài học
+                        </button>
+                        
+                        <button type="button" onclick="resetNewLessonForm()" style="background: #6c757d; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                        
+                        <button type="button" onclick="testNewLessonForm()" style="background: #28a745; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-flask"></i> Test
+                        </button>
+
+                        <button type="button" onclick="toggleFormDebug()" style="background: #17a2b8; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;">
+                            🔧 Debug
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+
+            <!-- Add Course Section -->
+            <div id="add-course" class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">Thêm khóa học mới</h2>
+                </div>
+
+                <div class="alert" id="addCourseAlert"></div>
+
+                <form class="course-form" id="courseForm" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="courseName">Tên khóa học *</label>
+                            <input type="text" id="courseName" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="courseCategory">Danh mục *</label>
+                            <select id="courseCategory" name="category" required>
+                                <option value="">Chọn danh mục</option>
+                                <option value="Programming">Lập trình</option>
+                                <option value="Design">Thiết kế</option>
+                                <option value="Business">Kinh doanh</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Photography">Nhiếp ảnh</option>
+                                <option value="Music">Âm nhạc</option>
+                                <option value="Language">Ngôn ngữ</option>
+                                <option value="Fitness">Thể dục</option>
+                                <option value="Cooking">Nấu ăn</option>
+                                <option value="Other">Khác</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="coursePrice">Giá (VND)</label>
+                            <input type="number" id="coursePrice" name="price" min="0" step="1000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="courseDuration">Thời lượng (phút)</label>
+                            <input type="number" id="courseDuration" name="duration" min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="courseLevel">Cấp độ *</label>
+                            <select id="courseLevel" name="level" required>
+                                <option value="">Chọn cấp độ</option>
+                                <option value="Beginner">Cơ bản</option>
+                                <option value="Intermediate">Trung bình</option>
+                                <option value="Advanced">Nâng cao</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="courseInstructor">Giảng viên *</label>
+                            <input type="text" id="courseInstructor" name="instructor" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseDescription">Mô tả khóa học *</label>
+                        <textarea id="courseDescription" name="description" required rows="4"></textarea>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hình ảnh khóa học</label>
+                            <div class="file-upload">
+                                <input type="file" id="courseImage" name="image" accept="image/*">
+                                <label for="courseImage" class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Chọn hình ảnh</span>
+                                    <small>PNG, JPG, GIF tối đa 5MB</small>
+                                </label>
+                            </div>
+                            <div id="imagePreview" class="file-preview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Video giới thiệu</label>
+                            <div class="file-upload">
+                                <input type="file" id="courseVideo" name="video" accept="video/*">
+                                <label for="courseVideo" class="file-upload-label">
+                                    <i class="fas fa-video"></i>
+                                    <span>Chọn video</span>
+                                    <small>MP4, AVI, MOV tối đa 100MB</small>
+                                </label>
+                            </div>
+                            <div id="videoPreview" class="file-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags (nhấn Enter để thêm)</label>
+                        <div class="tags-input" id="tagsInput">
+                            <input type="text" class="tag-input" placeholder="Nhập tag và nhấn Enter...">
+                        </div>
+                        <input type="hidden" id="courseTags" name="tags">
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Tạo khóa học
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetCourseForm()">
+                            <i class="fas fa-undo"></i> Reset form
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- User Management Section (Admin Only) -->
+            <div id="users" class="admin-section admin-only" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Quản lý người dùng</h2>
+                    <div class="section-controls">
+                        <div class="search-box">
+                            <input type="text" id="userSearch" placeholder="Tìm kiếm người dùng...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <select id="roleFilter">
+                            <option value="">Tất cả vai trò</option>
+                            <option value="user">Học viên</option>
+                            <option value="teacher">Giáo viên</option>
+                            <option value="admin">Quản trị viên</option>
+                        </select>
+                        <select id="statusFilter">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Bị khóa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="users-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Tổng người dùng</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalStudents">0</h3>
+                            <p>Học viên</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTeachers">0</h3>
+                            <p>Giáo viên</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalAdmins">0</h3>
+                            <p>Quản trị viên</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Tên</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Đăng ký</th>
+                                <th>Đăng nhập cuối</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button id="prevPageUsers" class="btn btn-secondary" disabled>
+                        <i class="fas fa-chevron-left"></i> Trước
+                    </button>
+                    <span id="pageInfoUsers">Trang 1 của 1</span>
+                    <button id="nextPageUsers" class="btn btn-secondary" disabled>
+                        Sau <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messenger Section -->
+            <div id="messenger" class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i> Tin nhắn
+                    </h2>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 350px 1fr; gap: 1.5rem; height: calc(100vh - 300px);">
+                    <!-- Conversations List -->
+                    <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="padding: 1rem; background: var(--primary-color); color: white; font-weight: 600;">
+                            <i class="fas fa-inbox"></i> Hộp thư đến
+                        </div>
+                        <div id="conversationsList" style="flex: 1; overflow-y: auto; padding: 0.5rem;">
+                            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                                <p>Đang tải...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; display: flex; flex-direction: column;">
+                        <div id="chatHeader" style="padding: 1rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                ?
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 1.125rem;">Chọn cuộc trò chuyện</div>
+                                <div style="font-size: 0.875rem; color: var(--text-secondary);">Để bắt đầu nhắn tin</div>
+                            </div>
+                        </div>
+                        <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 1.5rem; background: var(--bg-primary);">
+                            <div style="text-align: center; color: var(--text-secondary); padding: 3rem;">
+                                <i class="fas fa-comments" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                                <p>Chọn một cuộc trò chuyện để xem tin nhắn</p>
+                            </div>
+                        </div>
+                        <div id="chatInput" style="padding: 1rem; background: white; border-top: 1px solid var(--border-color); display: none;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <textarea id="messageInput" placeholder="Nhập tin nhắn..." style="flex: 1; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); resize: none; font-family: inherit;" rows="2"></textarea>
+                                <button id="sendMessageBtn" onclick="sendTeacherMessage()" style="padding: 0.75rem 1.5rem; background: var(--primary-color); color: white; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600;">
+                                    <i class="fas fa-paper-plane"></i> Gửi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="admin-section">
+                <div class="section-header">
+                    <h2 class="section-title">Cài đặt</h2>
+                </div>
+
+                <div class="course-form">
+                    <h3>Cài đặt chung</h3>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="autoPublish"> 
+                            Tự động xuất bản khóa học mới
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="emailNotifications"> 
+                            Nhận thông báo email
+                        </label>
+                    </div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu cài đặt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div id="editCourseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chỉnh sửa khóa học</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editCourseForm">
+                    <!-- Edit form will be populated dynamically -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Hủy</button>
+                <button type="submit" form="editCourseForm" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Lesson Modal -->
+    <div id="editLessonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chỉnh sửa bài học</h3>
+                <span class="close" onclick="closeEditLessonModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editLessonForm">
+                    <!-- Edit form will be populated dynamically -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEditLessonModal()">Hủy</button>
+                <button type="submit" form="editLessonForm" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Xác nhận xóa</h3>
+                <span class="close" onclick="closeDeleteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa khóa học này? Hành động này không thể hoàn tác.</p>
+                <p><strong id="deleteCourseName"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Hủy</button>
+                <button type="button" class="btn btn-primary" style="background: var(--error-color);" onclick="confirmDelete()">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/admin.js"></script>
+</body>
+</html>

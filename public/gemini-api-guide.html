@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔑 Hướng dẫn lấy API Key Google Gemini miễn phí</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 25%, #fbbc05 50%, #ea4335 75%, #9c27b0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        .step-container {
+            margin-bottom: 30px;
+        }
+
+        .step {
+            background: white;
+            border: 3px solid #4285f4;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(66, 133, 244, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-3px);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 25px;
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 3px 10px rgba(66, 133, 244, 0.4);
+        }
+
+        .step h3 {
+            color: #4285f4;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            margin-left: 20px;
+        }
+
+        .step p {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .step-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .step-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #495057;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .test-button {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .demo-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .demo-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .demo-card:hover {
+            border-color: #4285f4;
+            transform: translateY(-3px);
+        }
+
+        .demo-card h4 {
+            color: #4285f4;
+            margin-bottom: 10px;
+        }
+
+        .screenshot {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 3px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: block;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #d63031;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔑 Google Gemini API Key</h1>
+            <p>Hướng dẫn lấy API key miễn phí để kích hoạt AI thật trong hệ thống</p>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Quan trọng:</strong> Hiện tại hệ thống đang dùng <span class="highlight">Smart AI</span> 
+            (AI giả lập thông minh). Để có AI thật với chất lượng cao, bạn cần API key Google Gemini <strong>miễn phí</strong>!
+        </div>
+
+        <div class="step-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>🌐 Truy cập Google AI Studio</h3>
+                <p>Đây là trang chính thức của Google để lấy API key Gemini miễn phí.</p>
+                <a href="https://ai.google.dev/aistudio" target="_blank" class="step-link">
+                    🚀 Mở Google AI Studio
+                </a>
+                <p><strong>Hoặc:</strong> Truy cập trực tiếp trang API Keys:</p>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="step-link">
+                    🔑 Trực tiếp trang API Keys
+                </a>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>👤 Đăng nhập Google Account</h3>
+                <p>Sử dụng tài khoản Google của bạn (Gmail, YouTube, Google Drive...).</p>
+                <p>Nếu chưa có, tạo tài khoản Google miễn phí tại <a href="https://accounts.google.com" target="_blank">accounts.google.com</a></p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>🔑 Tạo API Key mới</h3>
+                <p>Trong Google AI Studio, tìm và nhấp vào nút <strong>"Create API Key"</strong> hoặc <strong>"Get API Key"</strong>.</p>
+                <p>Chọn Google Cloud project (hoặc tạo mới nếu chưa có).</p>
+                <div class="warning">
+                    <strong>💡 Mẹo:</strong> Nếu lần đầu sử dụng, Google sẽ tự động tạo project mặc định cho bạn.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>📋 Copy API Key</h3>
+                <p>API key sẽ có dạng: <code>AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</code></p>
+                <p><strong>Lưu ý:</strong> API key này rất quan trọng và bí mật, không chia sẻ công khai!</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <h3>⚙️ Cập nhật file .env</h3>
+                <p>Mở file <code>.env</code> trong thư mục dự án và thay thế:</p>
+                <div class="code-block">
+GEMINI_API_KEY=your-gemini-api-key-here
+                    <button class="copy-btn" onclick="copyToClipboard('GEMINI_API_KEY=')">Copy</button>
+                </div>
+                <p>Thành:</p>
+                <div class="code-block">
+GEMINI_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    <button class="copy-btn" onclick="copyToClipboard('GEMINI_API_KEY=AIzaSy')">Copy</button>
+                </div>
+                <p><strong>Thay XXXXXXXXX bằng API key thật của bạn!</strong></p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">6</div>
+                <h3>🔄 Restart Server</h3>
+                <p>Sau khi cập nhật .env, restart server để áp dụng API key:</p>
+                <div class="code-block">
+npm start
+                    <button class="copy-btn" onclick="copyToClipboard('npm start')">Copy</button>
+                </div>
+                <p>Hoặc nhấn <kbd>Ctrl+C</kbd> rồi chạy lại <code>npm start</code></p>
+            </div>
+        </div>
+
+        <div class="success">
+            <h3>🎉 Hoàn thành!</h3>
+            <p>Sau khi cập nhật API key, hệ thống sẽ sử dụng <strong>Google Gemini AI thật</strong> thay vì Smart AI!</p>
+        </div>
+
+        <button class="test-button" onclick="testGeminiConnection()">
+            🧪 Test kết nối Gemini AI ngay
+        </button>
+
+        <div class="demo-links">
+            <div class="demo-card">
+                <h4>🤖 Test AI Assistant</h4>
+                <p>Thử nghiệm AI với Gemini</p>
+                <a href="/test-gemini-ai.html" target="_blank" class="step-link">Mở Test Page</a>
+            </div>
+            
+            <div class="demo-card">
+                <h4>📚 Học với AI</h4>
+                <p>AI Assistant trong khóa học</p>
+                <a href="/course-learning.html?courseId=6919602c634ba8360f56b1b8" target="_blank" class="step-link">Trải nghiệm</a>
+            </div>
+            
+            <div class="demo-card">
+                <h4>🎯 AI Ultimate</h4>
+                <p>Trải nghiệm AI đầy đủ</p>
+                <a href="/ai-ultimate.html" target="_blank" class="step-link">AI Ultimate</a>
+            </div>
+        </div>
+
+        <div class="warning" style="margin-top: 40px;">
+            <h3>📊 So sánh Smart AI vs Gemini AI</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; text-align: left;">
+                <div>
+                    <h4>🧠 Smart AI (Hiện tại)</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>✅ Miễn phí hoàn toàn</li>
+                        <li>✅ Phản hồi nhanh (230ms)</li>
+                        <li>✅ Hiểu được tiếng Việt cơ bản</li>
+                        <li>⚠️ Câu trả lời có hạn</li>
+                        <li>⚠️ Không học được từ dữ liệu mới</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>🤖 Google Gemini AI</h4>
+                    <ul style="margin-left: 20px;">
+                        <li>🔥 Miễn phí với quota cao</li>
+                        <li>🔥 AI thật, thông minh</li>
+                        <li>🔥 Hiểu sâu ngữ cảnh</li>
+                        <li>🔥 Giải thích code chi tiết</li>
+                        <li>🔥 Tạo nội dung sáng tạo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Đã copy: ' + text);
+            });
+        }
+
+        async function testGeminiConnection() {
+            const button = document.querySelector('.test-button');
+            const originalText = button.textContent;
+            
+            button.textContent = '🔄 Đang kiểm tra...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: 'Hello, bạn có phải là Google Gemini AI không?',
+                        context: 'Test connection'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const source = result.source;
+                    let message = '';
+                    
+                    if (source === 'gemini') {
+                        message = '🎉 THÀNH CÔNG! Đang sử dụng Google Gemini AI thật!\\n\\nPhản hồi: ' + result.answer.substring(0, 100) + '...';
+                        alert(message);
+                        
+                        // Update UI to show success
+                        const successDiv = document.querySelector('.success');
+                        successDiv.innerHTML = `
+                            <h3>🎉 Google Gemini AI đã kích hoạt!</h3>
+                            <p>Hệ thống đang sử dụng <strong>AI thật</strong> với chất lượng cao!</p>
+                            <p><strong>Nguồn:</strong> ${source}</p>
+                        `;
+                        successDiv.style.background = '#d4edda';
+                        successDiv.style.borderColor = '#c3e6cb';
+                    } else {
+                        message = `⚠️ Đang sử dụng ${source === 'smart-ai' ? 'Smart AI' : source}\\n\\nĐể kích hoạt Gemini AI thật, vui lòng:\\n1. Lấy API key từ Google AI Studio\\n2. Cập nhật file .env\\n3. Restart server`;
+                        alert(message);
+                    }
+                } else {
+                    alert('❌ Lỗi kết nối: ' + result.message);
+                }
+            } catch (error) {
+                alert('❌ Lỗi: ' + error.message);
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Auto-scroll to highlight current step
+        document.addEventListener('DOMContentLoaded', function() {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                step.addEventListener('click', () => {
+                    step.style.background = '#e3f2fd';
+                    setTimeout(() => {
+                        step.style.background = 'white';
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

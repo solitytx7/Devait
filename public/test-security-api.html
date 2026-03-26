@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Security Questions API</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .test-section h3 { 
+            margin-top: 0; 
+            color: #2c3e50; 
+            border-bottom: 2px solid #3498db; 
+            padding-bottom: 10px; 
+        }
+        button { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin-right: 10px; 
+            margin-bottom: 10px; 
+        }
+        button:hover { background: #2980b9; }
+        .result { 
+            background: #ecf0f1; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            max-height: 300px; 
+            overflow-y: auto; 
+        }
+        input, select { 
+            padding: 8px; 
+            margin: 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Security Questions API Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Register New User</h3>
+        <input type="text" id="regName" placeholder="Name" value="Test Security User">
+        <input type="email" id="regEmail" placeholder="Email" value="securitytest@example.com">
+        <input type="password" id="regPassword" placeholder="Password" value="TestPass123">
+        <button onclick="registerUser()">Register</button>
+        <div class="result" id="regResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email" value="securitytest@example.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="TestPass123">
+        <button onclick="loginUser()">Login</button>
+        <div class="result" id="loginResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Get Security Questions List</h3>
+        <button onclick="getQuestionsList()">Get Questions List</button>
+        <div class="result" id="questionsListResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Setup Security Questions</h3>
+        <select id="question1">
+            <option value="">Select Question 1</option>
+        </select>
+        <input type="text" id="answer1" placeholder="Answer 1" value="Mèo Con">
+        <br>
+        <select id="question2">
+            <option value="">Select Question 2</option>
+        </select>
+        <input type="text" id="answer2" placeholder="Answer 2" value="Trường ABC">
+        <br>
+        <button onclick="setupQuestions()">Setup Questions</button>
+        <div class="result" id="setupResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4.5. Test Middleware</h3>
+        <button onclick="testProtectRoute()">Test Protect Middleware</button>
+        <div class="result" id="testResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. Verify User for Recovery</h3>
+        <input type="email" id="verifyEmail" placeholder="Email" value="securitytest@example.com">
+        <button onclick="verifyUser()">Verify User</button>
+        <div class="result" id="verifyResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>6. Reset Password with Security Questions</h3>
+        <input type="text" id="userId" placeholder="User ID (from step 5)">
+        <input type="text" id="resetAnswer1" placeholder="Answer 1" value="mèo con">
+        <input type="text" id="resetAnswer2" placeholder="Answer 2" value="trường abc">
+        <input type="password" id="newPassword" placeholder="New Password" value="NewPass123">
+        <button onclick="resetPassword()">Reset Password</button>
+        <div class="result" id="resetResult"></div>
+    </div>
+    
+    <script>
+        let token = '';
+        let questions = [];
+        
+        async function registerUser() {
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name: document.getElementById('regName').value,
+                        email: document.getElementById('regEmail').value,
+                        password: document.getElementById('regPassword').value,
+                        role: 'user'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('regResult').textContent = JSON.stringify(data, null, 2);
+                if (data.success) {
+                    token = data.data.token;
+                    document.getElementById('loginEmail').value = document.getElementById('regEmail').value;
+                }
+            } catch (error) {
+                document.getElementById('regResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function loginUser() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        email: document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('loginResult').textContent = JSON.stringify(data, null, 2);
+                if (data.success) {
+                    token = data.data.token;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function getQuestionsList() {
+            try {
+                const response = await fetch('/api/auth/security-questions/list');
+                const data = await response.json();
+                document.getElementById('questionsListResult').textContent = JSON.stringify(data, null, 2);
+                if (data.success) {
+                    questions = data.data.questions;
+                    populateSelects();
+                }
+            } catch (error) {
+                document.getElementById('questionsListResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        function populateSelects() {
+            const q1 = document.getElementById('question1');
+            const q2 = document.getElementById('question2');
+            
+            q1.innerHTML = '<option value="">Select Question 1</option>';
+            q2.innerHTML = '<option value="">Select Question 2</option>';
+            
+            questions.forEach(question => {
+                const option1 = new Option(question, question);
+                const option2 = new Option(question, question);
+                q1.add(option1);
+                q2.add(option2);
+            });
+        }
+        
+        async function setupQuestions() {
+            try {
+                console.log('🔍 Setting up questions with token:', token);
+                if (!token) {
+                    document.getElementById('setupResult').textContent = 'Error: No token available. Please login first.';
+                    return;
+                }
+                
+                const response = await fetch('/api/auth/security-questions', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        question1: document.getElementById('question1').value,
+                        answer1: document.getElementById('answer1').value,
+                        question2: document.getElementById('question2').value,
+                        answer2: document.getElementById('answer2').value
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('setupResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('setupResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testProtectRoute() {
+            try {
+                console.log('🔍 Testing protect middleware with token:', token);
+                if (!token) {
+                    document.getElementById('testResult').textContent = 'Error: No token available. Please login first.';
+                    return;
+                }
+                
+                const response = await fetch('/api/auth/test-protect', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('testResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('testResult').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function verifyUser() {
+            try {
+                const response = await fetch('/api/auth/security-questions/verify-user', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        email: document.getElementById('verifyEmail').value
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('verifyResult').textContent = JSON.stringify(data, null, 2);
+                if (data.success) {
+                    document.getElementById('userId').value = data.data.userId;
+                }
+            } catch (error) {
+                document.getElementById('verifyResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function resetPassword() {
+            try {
+                const response = await fetch('/api/auth/reset-password-security', {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        userId: document.getElementById('userId').value,
+                        answer1: document.getElementById('resetAnswer1').value,
+                        answer2: document.getElementById('resetAnswer2').value,
+                        newPassword: document.getElementById('newPassword').value,
+                        confirmPassword: document.getElementById('newPassword').value
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('resetResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('resetResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        // Auto-load questions list on page load
+        window.addEventListener('DOMContentLoaded', getQuestionsList);
+    </script>
+</body>
+</html>
